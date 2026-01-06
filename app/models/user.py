@@ -18,5 +18,10 @@ class User(Base):
     team_id = Column(Integer, ForeignKey("teams.id"), nullable=True)
 
     team = relationship("Team", back_populates="user")
-    submissions = relationship("Submission", back_populates="user")
-    score = relationship("UserScore", uselist=False, back_populates="user")
+
+    # submissions = relationship("Submission", back_populates="user")
+    # score = relationship("UserScore", uselist=False, back_populates="user")
+
+    # cascade delete
+    score = relationship("UserScore", back_populates="user", cascade="all, delete-orphan", uselist=False)
+    submissions = relationship("Submission", back_populates="user", cascade="all, delete-orphan")

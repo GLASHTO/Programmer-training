@@ -33,12 +33,14 @@ class Submission(Base):
 ## UserScore (агрегат / кеш)
 class UserScore(Base):
     __tablename__ = "user_scores"
-    user_id = Column(Integer, ForeignKey("users.id"), primary_key=True)
-    user_score = Column(Integer, nullable=False)
+    # Добавляем ondelete="CASCADE" на уровне базы данных
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), primary_key=True)
+    user_score = Column(Integer, nullable=False, default=0)
 
-    user = relationship("User", back_populates="score")
+    # Добавляем cascade="all, delete" на уровне SQLAlchemy
+    user = relationship("User", back_populates="score", cascade="all, delete")
     
-
+#
 
 
 ## TeamScore (агрегат / кеш)
