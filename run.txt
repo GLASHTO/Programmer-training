@@ -1,0 +1,44 @@
+
+cd "/mnt/c/Users/Администратор/Desktop/УНИК/3 курс/Осенний семестр/WebBack/проект на fastAPI/Backend"
+
+"C:\Users\Администратор\Desktop\УНИК\3 курс\Осенний семестр\WebBack\проект на fastAPI\Back\env\Scripts\activate"
+
+cd "C:\Users\Администратор\Desktop\УНИК\3 курс\Осенний семестр\WebBack\проект на fastAPI\" && docker-compose  up
+
+
+cd "C:\Users\Администратор\Desktop\УНИК\3 курс\Осенний семестр\WebBack\проект на fastAPI\Back\app\services\" && docker pull python:3.11-alpine && docker build -t sandbox-python -f Dockerfile.sandbox .
+
+"C:\Users\Администратор\Desktop\УНИК\3 курс\Осенний семестр\WebBack\проект на fastAPI\Back\env\Scripts\python.exe" -m uvicorn app.main:app --reload
+
+uvicorn app.main:app --reload
+
+docker exec -it f0cc1725cbe2 bash
+
+
+alembic init alembic # там где находится main.py
+
+
+
+alembic revision --autogenerate -m "Add new columns"
+
+alembic upgrade head
+
+DELETE FROM alembic_version;
+DROP TABLE users CASCADE;
+
+
+ curl -X POST "http://172.20.23.222:8000/submit" -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzY2NTEwNDgzfQ.4PIgNEKpzQr45N8nSkyYU4nbu8TVNW9ljhl4lz92Zs0" -H "Content-Type: application/json" -d '{
+    "task_id": 1,
+    "user_id": 1,
+    "code": "print(2+2)"
+}'
+
+
+
+{
+  "title": "string",
+  "description": "string",
+  "task_score": 5,
+  "task_time": 100,
+  "expected_output": "4"
+}
