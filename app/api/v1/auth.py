@@ -12,17 +12,20 @@ from jose import JWTError
 # from app.core.security import SECRET_KEY, ALGORITHM
 from app.core.config import settings  # импорт объекта настроек
 
+from app.schemas.user import UserLogin
+
 SECRET_KEY = settings.SECRET_KEY
 ALGORITHM = settings.ALGORITHM
 router = APIRouter()
 
 @router.post("/login")
-def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+# def login(data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+def login(data: UserLogin, db: Session = Depends(get_db)):
     # 1. Ищем пользователя
-    user = db.query(User).filter(User.username == form_data.username).first()
+    user = db.query(User).filter(User.username == data.username).first()
     
     # 2. Проверяем существование и пароль
-    if not user or not verify_password(form_data.password, user.password):
+    if not user or not verify_password(data.password, user.password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Неверное имя пользователя или пароль",

@@ -5,21 +5,22 @@ from sqlalchemy.orm import Session
 from app.models import User, Team
 from app.core.database import get_db
 from app.core.security import hash_password,  verify_password
+from app.schemas.user import UserCreate, UserPasswChange, UserToTeam, OneUserOut
 router = APIRouter(prefix="/users", tags=["Users"])
 
 
 ### Создать пользователя
 @router.post("/")
-def create_user(username: str, password: str, db: Session = Depends(get_db)):
+def create_user(data: UserCreate, db: Session = Depends(get_db)):
     # Проверяем, есть ли пользователь с таким username
-    existing_user = db.query(User).filter(User.username == username).first()
+    existing_user = db.query(User).filter(User.username == data.username).first()
     if existing_user:
         raise HTTPException(status_code=409, detail="User already exists")
     # Хешируем пароль
-    hashed_password = hash_password(password)
+    hashed_password = hash_password(data.password)
 
     # Создаём пользователя
-    user = User(username=username, password=hashed_password)
+    user = User(username=data.username, password=hashed_password)
     db.add(user)
     db.commit()
     db.refresh(user)
@@ -44,32 +45,32 @@ def get_user(user_id: int, db: Session = Depends(get_db)):
 
 
 ### Добавить пользователя в команду и проверить
-@router.put("/{user_id}/team/{team_id}")
-def set_team(user_id: int, team_id: int, db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.id == user_id).first()
-    team = db.query(Team).filter(Team.id == team_id).first()
+@router.put("/to_team")
+def set_team(data: UserToTeam, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.id == data.user_id).first()
+    team = db.query(Team).filter(Team.id == data.team_id).first()
     
     if not user or not team:
         raise HTTPException(404, "User or Team not found")
 
-    user.team_id = team_id
+    user.team_id = data.team_id
     db.commit()
     return {"status": "ok", "user": user.username, "team": team.team_name}
 
 ### Смена пароля
-@router.put("/{user_id}/new_password")
-def set_password(user_id: int, password: str, db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.id == user_id).first()
+@router.put("/new_password")
+def set_password(data: UserPasswChange, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.id == data.id).first()
     
     if not user:
         raise HTTPException(404, "User not found")
     
    
     # Хешируем пароль
-    hashed_password = hash_password(password)
+    hashed_password = hash_password(data.password)
     
     # Проверка, что новый пароль не совпадает со старым
-    if verify_password(password, user.password):
+    if verify_password(data.password, user.password):
         raise HTTPException(status_code=400, detail="New password cannot be the same as the old password")
     
 
@@ -80,7 +81,7 @@ def set_password(user_id: int, password: str, db: Session = Depends(get_db)):
 
 
 ### Удаление пользователя
-@router.delete("/{user_id}", response_model=dict)
+@router.delete("/delete/{user_id}", response_model=dict)
 def delete_user(user_id: int, db: Session = Depends(get_db)):
     # Находим пользователя
     user = db.query(User).filter(User.id == user_id).first()
