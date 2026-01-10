@@ -1,5 +1,3 @@
-
-
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.models import User, Team
@@ -28,8 +26,6 @@ def create_user(data: UserCreate, db: Session = Depends(get_db)):
 
 
 ### Получить всех пользователей
-
-
 @router.get("/")
 def get_users(db: Session = Depends(get_db)):
     return db.query(User).all()
