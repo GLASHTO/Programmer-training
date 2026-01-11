@@ -1,0 +1,10 @@
+.menu-grid {
+    @apply grid grid-cols-1 md:grid-cols-3 gap-6 mt-8;
+}
+
+.menu-card {
+    @apply border border-gray-800 bg-gray-900/20 p-6 cursor-pointer transition-all h-40 flex flex-col justify-center;
+}
+.menu-card:hover {
+    @apply border-green-500 bg-green-900/10 translate-y-[-2px];
+}

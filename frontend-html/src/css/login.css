@@ -1,0 +1,10 @@
+.login-container {
+    @apply w-full max-w-sm border border-green-900 bg-gray-900/50 p-8 backdrop-blur-sm relative;
+}
+
+.login-input {
+    @apply w-full bg-black border border-gray-700 p-3 text-white outline-none transition-colors mb-4;
+}
+.login-input:focus {
+    @apply border-green-500;
+}

@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+    background-color: #030712; /* gray-950 */
+    color: #d1d5db; /* gray-300 */
+    font-family: 'Courier New', Courier, monospace; /* Cyberpunk style */
+}
+
+/* Общий стиль для кнопок */
+.cyber-btn {
+    @apply border border-green-700 text-green-500 px-6 py-2 uppercase font-bold tracking-widest transition-all;
+}
+.cyber-btn:hover {
+    @apply bg-green-500 text-black shadow-[0_0_15px_rgba(0,255,0,0.4)];
+}

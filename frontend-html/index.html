@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Login // Code Battle</title>
+</head>
+<body class="flex items-center justify-center min-h-screen">
+    
+    <div class="login-container">
+        <h1 class="text-3xl text-white font-bold mb-1 tracking-tighter">SYSTEM_LOGIN</h1>
+        <div class="text-xs text-green-600 mb-6">:: SECURE CONNECTION ::</div>
+        
+        <div id="errorMsg" class="hidden text-red-500 text-xs border border-red-900 p-2 mb-4 bg-red-900/10"></div>
+
+        <form id="loginForm">
+            <input type="text" id="username" placeholder="OPERATOR_ID" class="login-input" required>
+            <input type="password" id="password" placeholder="ACCESS_KEY" class="login-input" required>
+            
+            <button type="submit" class="cyber-btn w-full mt-2">
+                CONNECT
+            </button>
+        </form>
+    </div>
+
+    <script type="module" src="/src/scripts/login.js"></script>
+</body>
+</html>

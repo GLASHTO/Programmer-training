@@ -1,0 +1,24 @@
+/* src/css/teams.css */
+@import './base.css';
+
+.teams-header {
+    @apply flex justify-between items-end border-b border-green-900 pb-4 mb-8;
+}
+
+.team-grid {
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
+}
+
+.team-card {
+    @apply border border-gray-800 bg-gray-900/20 p-6 flex flex-col justify-between min-h-[180px] transition-all relative;
+}
+
+/* Карточка твоей команды */
+.team-card.my-unit {
+    @apply border-green-500 bg-green-900/10 shadow-[0_0_15px_rgba(0,255,0,0.1)];
+}
+
+/* Заблокированная кнопка (если уже в команде) */
+.btn-disabled {
+    @apply border border-gray-800 text-gray-600 cursor-not-allowed w-full py-2 text-xs uppercase font-bold;
+}
