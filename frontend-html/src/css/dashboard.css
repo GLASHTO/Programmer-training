@@ -1,0 +1,144 @@
+/* src/css/dashboard.css */
+@import './base.css';
+
+:root {
+    --bg-dark: #050505;
+    --panel-bg: #0e0e0e;
+    --border-col: #333;
+    --accent-cyan: #00f3ff;
+    --accent-gold: #ffd700;
+    --accent-silver: #c0c0c0;
+    --accent-bronze: #cd7f32;
+}
+
+body {
+    background-color: var(--bg-dark);
+    color: #e0e0e0;
+    font-family: 'Courier New', monospace;
+    margin: 0;
+    padding: 20px;
+    height: 100vh;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.dashboard-layout {
+    max-width: 1000px;
+    margin: 0 auto;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header */
+.dash-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--border-col);
+    padding-bottom: 10px;
+}
+
+.dash-title {
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--accent-cyan);
+}
+
+.btn-home {
+    color: #888;
+    text-decoration: none;
+    border: 1px solid #444;
+    padding: 5px 15px;
+    transition: 0.2s;
+}
+
+.btn-home:hover {
+    color: #fff;
+    border-color: #fff;
+}
+
+/* Tabs */
+.tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.tab-btn {
+    background: transparent;
+    border: 1px solid var(--border-col);
+    color: #666;
+    padding: 10px 30px;
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: bold;
+    text-transform: uppercase;
+    flex-grow: 1;
+    transition: all 0.2s;
+}
+
+.tab-btn:hover {
+    background: #111;
+    color: #aaa;
+}
+
+.tab-btn.active {
+    background: rgba(0, 243, 255, 0.1);
+    border-color: var(--accent-cyan);
+    color: var(--accent-cyan);
+    box-shadow: 0 0 10px rgba(0, 243, 255, 0.1);
+}
+
+/* Table */
+.table-container {
+    background: var(--panel-bg);
+    border: 1px solid var(--border-col);
+    flex-grow: 1;
+    overflow-y: auto;
+    position: relative;
+}
+
+.rank-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.rank-table th {
+    background: #151515;
+    position: sticky;
+    top: 0;
+    padding: 15px;
+    color: #888;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border-col);
+    z-index: 2;
+}
+
+.rank-table td {
+    padding: 15px;
+    border-bottom: 1px solid #222;
+    color: #ccc;
+}
+
+.rank-table tr:hover {
+    background: #1a1a1a;
+}
+
+/* Ranks styling */
+.rank-col { width: 60px; text-align: center; font-weight: bold; }
+.score-col { width: 100px; text-align: right; color: var(--accent-cyan); }
+
+.rank-1 { color: var(--accent-gold); text-shadow: 0 0 5px rgba(255, 215, 0, 0.3); }
+.rank-2 { color: var(--accent-silver); }
+.rank-3 { color: var(--accent-bronze); }
+
+.loading {
+    padding: 40px;
+    text-align: center;
+    color: #666;
+}

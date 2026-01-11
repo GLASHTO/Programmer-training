@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Progrmming-training-login</title>
+    <title>Register // Code Arena</title>
     <link rel="stylesheet" href="/src/css/login.css">
 </head>
 <body>
 
     <div class="auth-container">
-        <h2 class="auth-title">System Access</h2>
+        <h2 class="auth-title">New Operator</h2>
         
-        <form id="loginForm" class="auth-form">
+        <form id="registerForm" class="auth-form">
             <div class="input-group">
                 <input type="text" id="username" class="input-field" placeholder="USERNAME" required>
             </div>
@@ -20,17 +20,14 @@
                 <input type="password" id="password" class="input-field" placeholder="PASSWORD" required>
             </div>
             
-            <button type="submit" class="btn-primary" id="loginBtn">Connect</button>
+            <button type="submit" class="btn-primary" id="submitBtn">Initialize</button>
         </form>
 
-        <div class="auth-links">
-            <a href="/register.html" class="link">Register</a>
-            <a href="/forgot-passw.html" class="link">Lost Access?</a>
-        </div>
-
         <div id="msgBox" class="msg-box"></div>
+
+        <a href="/index.html" class="btn-back-link">&lt; RETURN TO LOGIN</a>
     </div>
 
-    <script type="module" src="./src/scripts/login.js"></script>
+    <script type="module" src="/src/scripts/register.js"></script>
 </body>
 </html>

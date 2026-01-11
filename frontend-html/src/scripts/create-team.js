@@ -1,82 +1,49 @@
-import '../css/teams.css';
-import api from '../api/client.js';
+import apiClient from '../api/client.js';
 
-// Элементы DOM
-const loader = document.getElementById('loader');
-const createSection = document.getElementById('createSection');
-const deleteSection = document.getElementById('deleteSection');
-const currentTeamNameEl = document.getElementById('currentTeamName');
-const errorBox = document.getElementById('errorMsg');
+const createBtn = document.getElementById('createBtn');
+const nameInput = document.getElementById('teamName');
+const msgBox = document.getElementById('msgBox');
 
-let myTeamId = null;
-
-// Инициализация
-async function init() {
-    try {
-        const userId = localStorage.getItem('user_id');
-        if (!userId) window.location.href = '/index.html';
-
-        // 1. Получаем данные пользователя
-        const userRes = await api.get(`/api/v1/users/users/${userId}`);
-        myTeamId = userRes.data.team_id;
-
-        loader.classList.add('hidden');
-
-        if (myTeamId) {
-            // -- РЕЖИМ УДАЛЕНИЯ (Команда есть) --
-            // Загружаем имя команды для красоты
-            try {
-                const teamRes = await api.get(`/api/v1/teams/teams/${myTeamId}`);
-                currentTeamNameEl.textContent = teamRes.data.team_name;
-            } catch {
-                currentTeamNameEl.textContent = "UNKNOWN_UNIT";
-            }
-            deleteSection.classList.remove('hidden');
-        } else {
-            // -- РЕЖИМ СОЗДАНИЯ (Команды нет) --
-            createSection.classList.remove('hidden');
-        }
-
-    } catch (e) {
-        console.error(e);
-        showError('CONNECTION_FAILED');
-    }
-}
-
-// Обработчик СОЗДАНИЯ
-document.getElementById('createTeamForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const team_name = document.getElementById('teamName').value;
-    errorBox.classList.add('hidden');
-
-    try {
-        await api.post('/api/v1/teams/teams/', { team_name });
-        // После создания переходим в список, там уже можно увидеть свою команду
-        window.location.href = '/teams.html'; 
-    } catch (err) {
-        showError(err.response?.data?.detail || 'CREATION_FAILED');
-    }
-});
-
-// Обработчик УДАЛЕНИЯ
-document.getElementById('deleteBtn').addEventListener('click', async () => {
-    if (!myTeamId) return;
+createBtn.addEventListener('click', async () => {
+    const name = nameInput.value.trim();
     
-    const confirmDelete = confirm('CRITICAL WARNING: Confirm unit disbandment? This action cannot be undone.');
-    if (!confirmDelete) return;
+    // Сброс UI
+    msgBox.textContent = 'Processing...';
+    msgBox.style.color = '#fff';
+    createBtn.disabled = true;
+
+    if (!name) {
+        msgBox.textContent = 'Name required';
+        msgBox.style.color = '#ff0055';
+        createBtn.disabled = false;
+        return;
+    }
 
     try {
-        await api.delete(`/api/v1/teams/teams/${myTeamId}`);
-        // После удаления обновляем страницу (скрипт init снова запустится и покажет форму создания)
-        window.location.reload(); 
-    } catch (err) {
-        showError(err.response?.data?.detail || 'DELETION_FAILED_OR_ACCESS_DENIED');
+        // POST /api/v1/teams/teams/
+        // Body: { team_name: "..." }
+        // Authorization: Добавляется автоматически в client.js (interceptors)
+        await apiClient.post('/api/v1/teams/teams/', {
+            team_name: name
+        });
+
+        msgBox.textContent = 'Unit Created.';
+        msgBox.style.color = '#00ff9d';
+
+        // Перенаправление на "Моя команда"
+        setTimeout(() => {
+            window.location.href = '/my-teams.html';
+        }, 1000);
+
+    } catch (error) {
+        console.error(error);
+        createBtn.disabled = false;
+        msgBox.style.color = '#ff0055';
+
+        if (error.response && error.response.data && error.response.data.detail) {
+             msgBox.textContent = JSON.stringify(error.response.data.detail);
+        } else {
+             msgBox.textContent = 'Creation Failed';
+        }
     }
 });
-
-function showError(msg) {
-    errorBox.textContent = `:: ERROR :: ${msg}`;
-    errorBox.classList.remove('hidden');
-}
-
-init();

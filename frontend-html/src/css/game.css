@@ -1,0 +1,143 @@
+/* src/css/game.css */
+:root {
+    --bg-dark: #0a0a0a;
+    --bg-panel: #141414;
+    --text-main: #e0e0e0;
+    --accent-cyan: #00f3ff;
+    --accent-green: #00ff9d;
+    --accent-red: #ff0055;
+    --border-color: #333;
+  }
+  
+  body {
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    margin: 0;
+    font-family: 'Courier New', Courier, monospace;
+    overflow: hidden; /* Чтобы редактор не скакал */
+  }
+  
+  .game-container {
+    display: grid;
+    grid-template-rows: 60px 1fr;
+    height: 100vh;
+    width: 100vw;
+  }
+  
+  /* Header */
+  .game-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    background-color: var(--bg-panel);
+    border-bottom: 1px solid var(--border-color);
+  }
+  
+  .btn-back {
+    background: transparent;
+    border: 1px solid var(--accent-red);
+    color: var(--accent-red);
+    padding: 8px 16px;
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: bold;
+    transition: all 0.2s;
+  }
+  
+  .btn-back:hover {
+    background: var(--accent-red);
+    color: #000;
+  }
+  
+  .timer {
+    font-size: 1.2rem;
+    color: var(--accent-cyan);
+    text-shadow: 0 0 5px var(--accent-cyan);
+  }
+  
+  /* Main Content */
+  .game-content {
+    display: grid;
+    grid-template-columns: 400px 1fr;
+    height: 100%;
+  }
+  
+  /* Task Panel */
+  .task-panel {
+    padding: 20px;
+    background-color: var(--bg-panel);
+    border-right: 1px solid var(--border-color);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .task-title {
+    font-size: 1.4rem;
+    color: var(--accent-green);
+    margin-bottom: 10px;
+  }
+  
+  .task-desc {
+    line-height: 1.5;
+    font-size: 0.9rem;
+    color: #ccc;
+  }
+  
+  .task-meta {
+    font-size: 0.8rem;
+    color: #666;
+    margin-top: auto;
+  }
+  
+  /* Editor Area */
+  .editor-area {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    position: relative;
+  }
+  
+  .editor-wrapper {
+    flex-grow: 1;
+  }
+  
+  .control-panel {
+    height: 60px;
+    background-color: var(--bg-panel);
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 0 20px;
+    gap: 20px;
+  }
+  
+  .status-msg {
+    font-size: 0.9rem;
+  }
+  .status-msg.success { color: var(--accent-green); }
+  .status-msg.error { color: var(--accent-red); }
+  
+  .btn-submit {
+    background-color: var(--accent-cyan);
+    color: #000;
+    border: none;
+    padding: 10px 24px;
+    font-weight: bold;
+    cursor: pointer;
+    font-family: inherit;
+    text-transform: uppercase;
+  }
+  
+  .btn-submit:hover {
+    box-shadow: 0 0 10px var(--accent-cyan);
+  }
+  
+  .btn-submit:disabled {
+    background-color: #333;
+    cursor: not-allowed;
+    box-shadow: none;
+  }

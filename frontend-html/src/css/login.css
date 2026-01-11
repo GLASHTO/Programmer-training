@@ -1,10 +1,130 @@
-.login-container {
-    @apply w-full max-w-sm border border-green-900 bg-gray-900/50 p-8 backdrop-blur-sm relative;
+/* src/css/login.css */
+@import './base.css';
+
+body {
+    background-color: #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    font-family: 'Courier New', monospace;
+    overflow: hidden;
 }
 
-.login-input {
-    @apply w-full bg-black border border-gray-700 p-3 text-white outline-none transition-colors mb-4;
+/* Эффект сетки на фоне */
+body::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: 
+        linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
+        linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(255, 0, 0, 0.03));
+    background-size: 100% 2px, 3px 100%;
+    pointer-events: none;
+    z-index: -1;
 }
-.login-input:focus {
-    @apply border-green-500;
+
+.auth-container {
+    width: 350px;
+    padding: 40px;
+    background: #0a0a0a;
+    border: 1px solid #333;
+    position: relative;
+    box-shadow: 0 0 20px rgba(0,0,0,0.8);
 }
+
+.auth-title {
+    color: #e0e0e0;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-align: center;
+    margin-bottom: 30px;
+    border-bottom: 1px solid #333;
+    padding-bottom: 10px;
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.input-group {
+    position: relative;
+}
+
+.input-field {
+    width: 100%;
+    background: #111;
+    border: 1px solid #333;
+    color: #00f3ff;
+    padding: 12px 10px;
+    font-family: inherit;
+    font-size: 1rem;
+    box-sizing: border-box; /* Важно для padding */
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.input-field:focus {
+    border-color: #00f3ff;
+}
+
+.input-field::placeholder {
+    color: #444;
+}
+
+.btn-primary {
+    background: #e0e0e0;
+    color: #000;
+    border: none;
+    padding: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    font-family: inherit;
+    text-transform: uppercase;
+    transition: all 0.2s;
+}
+
+.btn-primary:hover {
+    background: #00f3ff;
+    box-shadow: 0 0 10px #00f3ff;
+}
+
+.auth-links {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+}
+
+.link {
+    color: #666;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.link:hover {
+    color: #e0e0e0;
+}
+
+.msg-box {
+    margin-top: 15px;
+    font-size: 0.8rem;
+    text-align: center;
+    min-height: 1rem;
+}
+
+.msg-box.error { color: #ff0055; }
+.msg-box.success { color: #00ff9d; }
+
+/* Кнопка назад для авторизации */
+.btn-back-link {
+    display: block;
+    margin-top: 20px;
+    text-align: center;
+    color: #444;
+    text-decoration: none;
+    font-size: 0.8rem;
+}
+.btn-back-link:hover { color: #888; }

@@ -1,0 +1,136 @@
+/* src/css/profile.css */
+@import './base.css';
+
+:root {
+    --panel-bg: #0a0a0a;
+    --border-col: #333;
+    --accent: #00f3ff;
+}
+
+body {
+    background-color: #050505;
+    color: #e0e0e0;
+    font-family: 'Courier New', monospace;
+    display: flex;
+    justify-content: center;
+    padding-top: 50px;
+    height: 100vh;
+    box-sizing: border-box;
+}
+
+.profile-container {
+    width: 500px;
+    background: var(--panel-bg);
+    border: 1px solid var(--border-col);
+    padding: 30px;
+    height: fit-content;
+    box-shadow: 0 0 30px rgba(0,0,0,0.5);
+}
+
+/* Header */
+.header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-col);
+    padding-bottom: 15px;
+    margin-bottom: 30px;
+}
+
+.page-title {
+    margin: 0;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.btn-back {
+    background: transparent;
+    border: 1px solid #444;
+    color: #888;
+    padding: 5px 15px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: 0.2s;
+    text-decoration: none;
+    font-size: 0.8rem;
+}
+
+.btn-back:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+/* Info Section */
+.info-section {
+    margin-bottom: 40px;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    padding-bottom: 5px;
+    border-bottom: 1px dashed #222;
+}
+
+.label { color: #666; }
+.value { color: #fff; font-weight: bold; }
+.value.score { color: #00ff9d; }
+
+/* Security Section */
+.security-section {
+    position: relative;
+}
+
+.sec-title {
+    font-size: 0.9rem;
+    color: #444;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.input-dark {
+    width: 100%;
+    background: #111;
+    border: 1px solid #333;
+    color: white;
+    padding: 10px;
+    font-family: inherit;
+    box-sizing: border-box;
+}
+
+.input-dark:focus {
+    border-color: var(--accent);
+    outline: none;
+}
+
+.btn-action {
+    width: 100%;
+    background: #222;
+    color: var(--accent);
+    border: 1px solid #333;
+    padding: 12px;
+    cursor: pointer;
+    font-family: inherit;
+    text-transform: uppercase;
+    font-weight: bold;
+    transition: all 0.2s;
+}
+
+.btn-action:hover {
+    background: var(--accent);
+    color: #000;
+}
+
+.msg-box {
+    margin-top: 10px;
+    font-size: 0.8rem;
+    text-align: center;
+}
+.success { color: #00ff9d; }
+.error { color: #ff0055; }

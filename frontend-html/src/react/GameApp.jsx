@@ -1,18 +1,171 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import '../css/base.css'; // База
-import '../css/game.css'; // Стили игры
+import React, { useState, useEffect } from 'react';
+import { createRoot } from 'react-dom/client';
+import Editor from '@monaco-editor/react';
+import apiClient from '../api/client';
+import '../css/game.css';
 
-const GameApp = () => {
-  return (
-    <div className="min-h-screen p-4 flex flex-col">
-       <div className="border border-green-500 p-4">
-          <h1 className="text-green-500">REACT_MODULE_LOADED</h1>
-          {/* Тут будет вся логика игры, редактор кода и т.д. */}
-       </div>
-       <a href="/menu.html" className="mt-4 text-gray-500 hover:text-white">BACK TO MENU</a>
-    </div>
-  );
+// Компонент Таймера
+const Timer = ({ initialTime }) => {
+    const [timeLeft, setTimeLeft] = useState(initialTime || 3600);
+
+    useEffect(() => {
+        if (!initialTime) return;
+        setTimeLeft(initialTime);
+    }, [initialTime]);
+
+    useEffect(() => {
+        if (timeLeft <= 0) return;
+        const intervalId = setInterval(() => {
+            setTimeLeft((prev) => prev - 1);
+        }, 1000);
+        return () => clearInterval(intervalId);
+    }, [timeLeft]);
+
+    const formatTime = (seconds) => {
+        const m = Math.floor(seconds / 60);
+        const s = seconds % 60;
+        return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+    };
+
+    return <div className="timer">TIME: {formatTime(timeLeft)}</div>;
 };
 
-ReactDOM.createRoot(document.getElementById('root')).render(<GameApp />);
+// Основной компонент игры
+const GameApp = () => {
+    const [task, setTask] = useState(null);
+    const [code, setCode] = useState('// Write your solution here\n');
+    const [status, setStatus] = useState(null); // { type: 'success' | 'error', msg: string }
+    const [loading, setLoading] = useState(false);
+
+    // Загрузка задачи при старте
+    useEffect(() => {
+        const fetchTask = async () => {
+            try {
+                // Получаем список задач и берем первую (для упрощения, т.к. логика выбора не описана)
+                const response = await apiClient.get('/api/v1/tasks/tasks/');
+                if (response.data && response.data.length > 0) {
+                    setTask(response.data[0]);
+                } else {
+                    setStatus({ type: 'error', msg: 'No tasks available.' });
+                }
+            } catch (error) {
+                console.error("Failed to load task", error);
+                setStatus({ type: 'error', msg: 'Error loading task data.' });
+            }
+        };
+
+        fetchTask();
+    }, []);
+
+    const handleBack = () => {
+        window.location.href = '/menu.html';
+    };
+
+    const handleSubmit = async () => {
+        if (!task) return;
+        setLoading(true);
+        setStatus(null);
+
+        try {
+            const payload = {
+                task_id: task.id,
+                code: code
+            };
+            
+            // Authorization header добавляется автоматически в client.js интерцепторе
+            await apiClient.post('/api/v1/games/submit', payload);
+            
+            setStatus({ type: 'success', msg: 'Solution Submitted Successfully' });
+        } catch (error) {
+            console.error(error);
+            // Обработка ошибок валидации или сервера
+            const errorMsg = error.response?.data?.detail 
+                ? JSON.stringify(error.response.data.detail) 
+                : 'Submission Failed';
+            setStatus({ type: 'error', msg: errorMsg });
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    if (!task && !status) return <div className="game-container" style={{padding: 20}}>Loading system...</div>;
+
+    return (
+        <div className="game-container">
+            {/* Header */}
+            <header className="game-header">
+                <button className="btn-back" onClick={handleBack}>&lt; EXIT</button>
+                <Timer initialTime={task ? task.task_time : 0} />
+                <div style={{width: 80}}></div> {/* Spacer for centering */}
+            </header>
+
+            {/* Content */}
+            <div className="game-content">
+                {/* Left: Task Info */}
+                <aside className="task-panel">
+                    {task ? (
+                        <>
+                            <h2 className="task-title">{task.title}</h2>
+                            <div className="task-desc">
+                                <p>{task.description}</p>
+                            </div>
+                            <div className="task-example">
+                                <strong>Expected Output:</strong>
+                                <pre style={{background: '#000', padding: 10, marginTop: 5}}>
+                                    {task.expected_output}
+                                </pre>
+                            </div>
+                            <div className="task-meta">
+                                <span>Score: {task.task_score} pts</span>
+                            </div>
+                        </>
+                    ) : (
+                        <div className="task-desc">Task not loaded.</div>
+                    )}
+                </aside>
+
+                {/* Right: Editor */}
+                <main className="editor-area">
+                    <div className="editor-wrapper">
+                        <Editor
+                            height="100%"
+                            defaultLanguage="python" // По умолчанию python, можно менять
+                            theme="vs-dark"
+                            value={code}
+                            onChange={(value) => setCode(value)}
+                            options={{
+                                minimap: { enabled: false },
+                                fontSize: 14,
+                                scrollBeyondLastLine: false,
+                                automaticLayout: true,
+                            }}
+                        />
+                    </div>
+                    
+                    {/* Control Panel */}
+                    <footer className="control-panel">
+                        {status && (
+                            <div className={`status-msg ${status.type}`}>
+                                 {status.msg}
+                            </div>
+                        )}
+                        <button 
+                            className="btn-submit" 
+                            onClick={handleSubmit} 
+                            disabled={loading || !task}
+                        >
+                            {loading ? 'UPLOADING...' : 'SUBMIT CODE'}
+                        </button>
+                    </footer>
+                </main>
+            </div>
+        </div>
+    );
+};
+
+// Монтирование React приложения
+const container = document.getElementById('root');
+if (container) {
+    const root = createRoot(container);
+    root.render(<GameApp />);
+}

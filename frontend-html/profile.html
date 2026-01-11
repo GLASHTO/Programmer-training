@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile // Code Arena</title>
+    <link rel="stylesheet" href="/src/css/profile.css">
+</head>
+<body>
+
+    <div class="profile-container">
+        <div class="header-row">
+            <h2 class="page-title">Operator Profile</h2>
+            <a href="/menu.html" class="btn-back">&lt; BACK</a>
+        </div>
+
+        <div class="info-section">
+            <div class="info-row">
+                <span class="label">IDENTITY (USERNAME)</span>
+                <span class="value" id="username">LOADING...</span>
+            </div>
+            <div class="info-row">
+                <span class="label">CURRENT SCORE</span>
+                <span class="value score" id="score">---</span>
+            </div>
+            <div class="info-row">
+                <span class="label">DATABASE ID</span>
+                <span class="value" id="userId">---</span>
+            </div>
+        </div>
+
+        <div class="security-section">
+            <div class="sec-title">Security Protocols</div>
+            
+            <div class="form-group">
+                <input type="password" id="newPass" class="input-dark" placeholder="NEW PASSPHRASE">
+            </div>
+            <div class="form-group">
+                <input type="password" id="confirmPass" class="input-dark" placeholder="CONFIRM PASSPHRASE">
+            </div>
+            
+            <button id="saveBtn" class="btn-action">Update Credentials</button>
+            <div id="msgBox" class="msg-box"></div>
+        </div>
+    </div>
+
+    <script type="module" src="/src/scripts/profile.js"></script>
+</body>
+</html>

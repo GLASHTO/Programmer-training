@@ -1,3 +1,4 @@
+from app.api.v1.auth import get_current_user
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.models import User, Team
@@ -41,17 +42,47 @@ def get_user(user_id: int, db: Session = Depends(get_db)):
 
 
 ### Добавить пользователя в команду и проверить
+# @router.put("/to_team")
+# def set_team(data: UserToTeam, db: Session = Depends(get_db)):
+#     user = db.query(User).filter(User.id == data.user_id).first()
+#     team = db.query(Team).filter(Team.id == data.team_id).first()
+    
+#     if not user or not team:
+#         raise HTTPException(404, "User or Team not found")
+
+#     user.team_id = data.team_id
+#     db.commit()
+#     return {"status": "ok", "user": user.username, "team": team.team_name}
 @router.put("/to_team")
-def set_team(data: UserToTeam, db: Session = Depends(get_db)):
+def set_team(
+    data: UserToTeam, 
+    db: Session = Depends(get_db),
+    # Если это действие делает сам пользователь, раскомментируйте строку ниже и используйте current_user
+    current_user: User = Depends(get_current_user) 
+):
+    # Находим пользователя (если делает админ)
     user = db.query(User).filter(User.id == data.user_id).first()
+    
+    # Если делает сам пользователь, то user = current_user
+    
     team = db.query(Team).filter(Team.id == data.team_id).first()
     
     if not user or not team:
         raise HTTPException(404, "User or Team not found")
 
+    # === ГЛАВНАЯ ПРОВЕРКА ===
+    # Если у пользователя уже есть team_id, запрещаем переход
+    if user.team_id is not None:
+         raise HTTPException(
+            status_code=400, 
+            detail="User is already in a team. Leave current team first."
+        )
+
     user.team_id = data.team_id
     db.commit()
     return {"status": "ok", "user": user.username, "team": team.team_name}
+
+
 
 ### Смена пароля
 @router.put("/new_password")

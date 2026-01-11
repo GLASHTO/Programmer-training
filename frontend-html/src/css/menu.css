@@ -1,10 +1,111 @@
-.menu-grid {
-    @apply grid grid-cols-1 md:grid-cols-3 gap-6 mt-8;
+/* src/css/menu.css */
+@import './base.css'; /* Предполагаем наличие базовых переменных */
+
+:root {
+    --menu-width: 400px;
+    --btn-height: 50px;
 }
 
-.menu-card {
-    @apply border border-gray-800 bg-gray-900/20 p-6 cursor-pointer transition-all h-40 flex flex-col justify-center;
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #050505;
+    background-image: radial-gradient(circle at 50% 50%, #111 0%, #000 100%);
 }
-.menu-card:hover {
-    @apply border-green-500 bg-green-900/10 translate-y-[-2px];
+
+.menu-container {
+    width: var(--menu-width);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* User Stats Panel */
+.stats-panel {
+    border: 1px solid #333;
+    background: #0a0a0a;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    position: relative;
+}
+
+.stats-panel::before {
+    content: 'USER_METRICS';
+    position: absolute;
+    top: -10px;
+    left: 10px;
+    background: #050505;
+    padding: 0 5px;
+    color: #666;
+    font-size: 0.7rem;
+}
+
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.1rem;
+}
+
+.stat-label { color: #666; }
+.stat-value { color: #00f3ff; text-shadow: 0 0 5px rgba(0, 243, 255, 0.3); }
+
+/* Navigation */
+.main-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.nav-btn {
+    height: var(--btn-height);
+    background: transparent;
+    border: 1px solid #333;
+    color: #e0e0e0;
+    font-family: 'Courier New', monospace;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: left;
+    padding-left: 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+.nav-btn:hover {
+    border-color: #00f3ff;
+    color: #00f3ff;
+    background: rgba(0, 243, 255, 0.05);
+    padding-left: 30px; /* Эффект сдвига */
+}
+
+.nav-btn::after {
+    content: '>>';
+    position: absolute;
+    right: 20px;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.nav-btn:hover::after {
+    opacity: 1;
+}
+
+/* Logout Special Style */
+.nav-btn.logout {
+    border-color: #333;
+    margin-top: 20px;
+    color: #ff0055;
+    text-align: center;
+    padding: 0;
+}
+
+.nav-btn.logout:hover {
+    background: #ff0055;
+    color: #000;
+    padding: 0;
+    box-shadow: 0 0 15px rgba(255, 0, 85, 0.4);
 }

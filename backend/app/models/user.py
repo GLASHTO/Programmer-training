@@ -17,8 +17,8 @@ class User(Base):
 
     team_id = Column(Integer, ForeignKey("teams.id"), nullable=True)
 
-    team = relationship("Team", back_populates="user")
-
+    # team = relationship("Team", back_populates="user")
+    team = relationship("Team", back_populates="members", foreign_keys=[team_id])
     # submissions = relationship("Submission", back_populates="user")
     # score = relationship("UserScore", uselist=False, back_populates="user")
 

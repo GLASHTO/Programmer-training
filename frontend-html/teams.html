@@ -1,30 +1,26 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <title>Squadron Registry</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teams // Code Arena</title>
+    <link rel="stylesheet" href="/src/css/teams.css">
 </head>
-<body class="p-8 bg-gray-950">
-    <div class="max-w-6xl mx-auto">
-        <div class="teams-header">
-            <div>
-                <h1 class="text-3xl text-white font-bold tracking-tighter">SQUADRONS</h1>
-                <div id="userStatus" class="text-xs text-gray-500 mt-1">CHECKING STATUS...</div>
-            </div>
-            
-            <div class="flex gap-4">
-                <a href="/create-team.html" id="createTeamLink" class="hidden cyber-btn text-xs no-underline">
-                    + INITIALIZE UNIT
-                </a>
-                <a href="/menu.html" class="text-xs text-gray-500 hover:text-white border border-transparent hover:border-gray-700 px-3 py-2 transition-all">
-                    [ BACK_TO_MENU ]
-                </a>
-            </div>
-        </div>
+<body>
 
-        <div id="teamsGrid" class="team-grid">
-            <div class="text-green-500 animate-pulse">LOADING_DATA_STREAMS...</div>
+    <header class="teams-header">
+        <h1 class="title">Global Units</h1>
+        <div class="controls">
+            <input type="text" id="searchInput" class="search-input" placeholder="SEARCH UNIT...">
+            <a href="/create-team.html" class="btn-create">+ NEW</a>
+            <a href="/menu.html" class="btn-nav">&lt; MENU</a>
         </div>
+    </header>
+
+    <div id="statusMsg" class="status-bar"></div>
+
+    <div id="teamsGrid" class="teams-grid">
+        <div style="color: #666;">Loading units...</div>
     </div>
 
     <script type="module" src="/src/scripts/teams.js"></script>

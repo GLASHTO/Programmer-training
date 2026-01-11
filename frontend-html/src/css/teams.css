@@ -1,24 +1,167 @@
 /* src/css/teams.css */
 @import './base.css';
 
+:root {
+    --card-bg: #0e0e0e;
+    --card-border: #333;
+    --accent-join: #00ff9d;
+    --accent-del: #ff0055;
+    --accent-create: #00f3ff;
+}
+
+body {
+    background-color: #050505;
+    color: #e0e0e0;
+    font-family: 'Courier New', monospace;
+    padding: 20px;
+    height: 100vh;
+    box-sizing: border-box;
+    overflow-x: hidden;
+}
+
+/* Header & Controls */
 .teams-header {
-    @apply flex justify-between items-end border-b border-green-900 pb-4 mb-8;
+    max-width: 800px;
+    margin: 0 auto 30px auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #333;
+    padding-bottom: 20px;
 }
 
-.team-grid {
-    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
+.title {
+    font-size: 1.5rem;
+    color: #fff;
+    text-transform: uppercase;
+    margin: 0;
 }
 
+.controls {
+    display: flex;
+    gap: 15px;
+}
+
+.search-input {
+    background: #111;
+    border: 1px solid #333;
+    color: #fff;
+    padding: 8px 15px;
+    font-family: inherit;
+    width: 250px;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--accent-create);
+}
+
+.btn-nav {
+    text-decoration: none;
+    color: #888;
+    border: 1px solid #444;
+    padding: 8px 15px;
+    transition: 0.2s;
+    font-size: 0.9rem;
+}
+
+.btn-nav:hover {
+    color: #fff;
+    border-color: #fff;
+}
+
+.btn-create {
+    background: var(--accent-create);
+    color: #000;
+    border: none;
+    padding: 8px 20px;
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+}
+
+/* Grid Layout */
+.teams-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* Team Card */
 .team-card {
-    @apply border border-gray-800 bg-gray-900/20 p-6 flex flex-col justify-between min-h-[180px] transition-all relative;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 150px;
+    transition: transform 0.2s, box-shadow 0.2s;
+    position: relative;
 }
 
-/* Карточка твоей команды */
-.team-card.my-unit {
-    @apply border-green-500 bg-green-900/10 shadow-[0_0_15px_rgba(0,255,0,0.1)];
+.team-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+    border-color: #555;
 }
 
-/* Заблокированная кнопка (если уже в команде) */
-.btn-disabled {
-    @apply border border-gray-800 text-gray-600 cursor-not-allowed w-full py-2 text-xs uppercase font-bold;
+.team-name {
+    font-size: 1.2rem;
+    color: #fff;
+    margin: 0 0 10px 0;
+    word-break: break-all;
 }
+
+.team-id {
+    font-size: 0.8rem;
+    color: #666;
+    margin-bottom: auto;
+}
+
+.team-actions {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.btn-action {
+    background: transparent;
+    border: 1px solid var(--accent-join);
+    color: var(--accent-join);
+    padding: 5px 15px;
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    transition: all 0.2s;
+}
+
+.btn-action:hover {
+    background: var(--accent-join);
+    color: #000;
+}
+
+/* Specific for My Team page */
+.btn-action.delete {
+    border-color: var(--accent-del);
+    color: var(--accent-del);
+}
+.btn-action.delete:hover {
+    background: var(--accent-del);
+    color: #fff;
+}
+
+/* Messages */
+.status-bar {
+    max-width: 800px;
+    margin: 0 auto 20px auto;
+    text-align: center;
+    min-height: 1.2rem;
+    font-size: 0.9rem;
+}
+.status-bar.success { color: var(--accent-join); }
+.status-bar.error { color: var(--accent-del); }

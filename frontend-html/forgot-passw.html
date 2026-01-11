@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recovery // Code Arena</title>
+    <link rel="stylesheet" href="/src/css/login.css">
+</head>
+<body>
+
+    <div class="auth-container">
+        <h2 class="auth-title">Override Access</h2>
+        
+        <form id="resetForm" class="auth-form">
+            <div class="input-group">
+                <input type="text" id="username" class="input-field" placeholder="TARGET IDENTITY" required>
+            </div>
+            
+            <div class="input-group">
+                <input type="password" id="newPassword" class="input-field" placeholder="NEW PASSPHRASE" required>
+            </div>
+            
+            <button type="submit" class="btn-primary" id="resetBtn">Execute Override</button>
+        </form>
+
+        <div id="msgBox" class="msg-box"></div>
+
+        <a href="/index.html" class="btn-back-link">&lt; RETURN TO LOGIN</a>
+    </div>
+
+    <script type="module" src="/src/scripts/forgot-passw.js"></script>
+</body>
+</html>
