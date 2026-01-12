@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     } catch (error) {
         console.error(error);
-        msgBox.textContent = 'Failed to load profile data.';
+        msgBox.textContent = 'Ошибка в загрузке данных команды';
         msgBox.className = 'msg-box error';
     }
 
@@ -33,13 +33,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         msgBox.className = 'msg-box';
 
         if (!p1 || !p2) {
-            msgBox.textContent = 'Fields cannot be empty';
+            msgBox.textContent = 'Поля не могут быть пустыми';
             msgBox.classList.add('error');
             return;
         }
 
         if (p1 !== p2) {
-            msgBox.textContent = 'Passwords do not match';
+            msgBox.textContent = 'Пароли не совпадают';
             msgBox.classList.add('error');
             return;
         }
@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 password: p1
             });
 
-            msgBox.textContent = 'Credentials Updated Successfully';
+            msgBox.textContent = 'Данные обновлены';
             msgBox.classList.add('success');
             
             // Очистка полей
@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         } catch (error) {
             console.error(error);
             const errDetail = error.response?.data?.detail;
-            msgBox.textContent = errDetail ? JSON.stringify(errDetail) : 'Update Failed';
+            msgBox.textContent = errDetail ? JSON.stringify(errDetail) : 'Обновление прошло не удачно';
             msgBox.classList.add('error');
         }
     });

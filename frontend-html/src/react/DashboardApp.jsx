@@ -21,6 +21,7 @@ const DashboardApp = () => {
 
             if (activeTab === 'users') {
                 // Сортировка пользователей по очкам
+                console.log(users);
                 const sortedUsers = users.sort((a, b) => (b.score || 0) - (a.score || 0));
                 setData(sortedUsers);
             } else {

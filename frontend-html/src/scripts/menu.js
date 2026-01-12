@@ -10,13 +10,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
-    // Элементы UI
+    // Элементы
     const elUsername = document.getElementById('username');
     const elScore = document.getElementById('score');
     const elTeam = document.getElementById('teamName');
     const btnLogout = document.getElementById('logoutBtn');
 
-    // Логаут
+    // Выход
     btnLogout.addEventListener('click', () => {
         localStorage.clear();
         window.location.href = '/index.html';
@@ -26,22 +26,28 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
         const response = await apiClient.get(`/api/v1/users/users/${userId}`);
         const user = response.data;
-        
         // Отображение данных
-        // Предполагаем структуру объекта user (т.к. schema пустая в spec, опираемся на стандартные поля)
-        elUsername.textContent = user.username || 'UNKNOWN';
+        elUsername.textContent = user.username || 'Неизвестно';
         
-        // Если у пользователя есть поле score или rating
+        // Если у пользователя score не больше 0, то отобразить 0
         elScore.textContent = user.score !== undefined ? user.score : '0';
 
-        // Если есть ID команды, пробуем узнать её имя или просто пишем ID
-        if (user.team_id) {
-             // Можно сделать доп запрос на получение имени команды, 
-             // но для простоты пока выведем ID или заглушку, если API не возвращает имя сразу
-             elTeam.textContent = `ID: ${user.team_id}`; 
-             // Опционально: fetchTeamName(user.team_id);
+        // Логика отображения команды, запрашиваем данные команды ТОЛЬКО если есть ID
+        if (user.team_id !== null) {
+            try {
+                const teamResponse = await apiClient.get(`/api/v1/teams/teams/${user.team_id}`);
+                
+                // Если API возвращает объект с team_name, берем его. Иначе fallback на ID.
+                const teamName = teamResponse.data.team_name || teamResponse.data.name;
+                elTeam.textContent = teamName || `ID команды: ${user.team_id}`;
+                
+            } catch (teamError) {
+                // Если не удалось загрузить название команды, оставляем ID
+                console.warn('Не удалось загрузить название', teamError);
+                elTeam.textContent = `ID: ${user.team_id}`;
+            }
         } else {
-            elTeam.textContent = 'NO AFFILIATION';
+            elTeam.textContent = 'Никуда не вступал'; 
         }
 
     } catch (error) {

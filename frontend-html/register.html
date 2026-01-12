@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register // Code Arena</title>
+    <title>Регистрация</title>
     <link rel="stylesheet" href="/src/css/login.css">
 </head>
 <body>
 
     <div class="auth-container">
-        <h2 class="auth-title">New Operator</h2>
+        <h2 class="auth-title">Новый пользователь</h2>
         
         <form id="registerForm" class="auth-form">
             <div class="input-group">
@@ -19,13 +19,17 @@
             <div class="input-group">
                 <input type="password" id="password" class="input-field" placeholder="PASSWORD" required>
             </div>
-            
-            <button type="submit" class="btn-primary" id="submitBtn">Initialize</button>
+
+            <div class="input-group">
+                <input type="password" id="password-repeat" class="input-field" placeholder="CONFIRM PASSWORD" required>
+            </div>
+
+            <button type="submit" class="btn-primary" id="submitBtn">Зарегистрироваться</button>
         </form>
 
         <div id="msgBox" class="msg-box"></div>
 
-        <a href="/index.html" class="btn-back-link">&lt; RETURN TO LOGIN</a>
+        <a href="/index.html" class="btn-back-link">&lt; У меня уже есть аккаунт</a>
     </div>
 
     <script type="module" src="/src/scripts/register.js"></script>

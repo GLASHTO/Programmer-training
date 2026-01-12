@@ -72,22 +72,40 @@ const GameApp = () => {
                 code: code
             };
             
-            // Authorization header добавляется автоматически в client.js интерцепторе
-            await apiClient.post('/api/v1/games/submit', payload);
+            // 1. Сохраняем ответ сервера в переменную
+            const response = await apiClient.post('/api/v1/games/submit', payload);
+            const result = response.data; // { status: true, output: "string", error: null, ... }
             
-            setStatus({ type: 'success', msg: 'Solution Submitted Successfully' });
+            // 2. Проверяем поле status из твоего JSON
+            if (result.status === true) {
+                // Если решение верное
+                setStatus({ 
+                    type: 'success', 
+                    msg: `SUCCESS! Output: ${result.output}` 
+                });
+            } else {
+                // Если решение неверное или код упал с ошибкой
+                // Если есть error (из stderr), показываем его, иначе показываем output (неверный вывод)
+                const errorText = result.error ? result.error : `Wrong Answer. Got: ${result.output}`;
+                setStatus({ 
+                    type: 'error', 
+                    msg: errorText 
+                });
+            }
+
         } catch (error) {
             console.error(error);
-            // Обработка ошибок валидации или сервера
+            // Обработка ошибок сети или 500-х ошибок сервера
             const errorMsg = error.response?.data?.detail 
                 ? JSON.stringify(error.response.data.detail) 
-                : 'Submission Failed';
+                : 'Connection Failed';
             setStatus({ type: 'error', msg: errorMsg });
         } finally {
             setLoading(false);
         }
     };
 
+    
     if (!task && !status) return <div className="game-container" style={{padding: 20}}>Loading system...</div>;
 
     return (
@@ -129,7 +147,7 @@ const GameApp = () => {
                     <div className="editor-wrapper">
                         <Editor
                             height="100%"
-                            defaultLanguage="python" // По умолчанию python, можно менять
+                            defaultLanguage="python"
                             theme="vs-dark"
                             value={code}
                             onChange={(value) => setCode(value)}

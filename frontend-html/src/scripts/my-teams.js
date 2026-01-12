@@ -26,13 +26,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                 renderTeamInfo(team);
             } catch (teamError) {
                 console.error(teamError);
-                renderError('Failed to retrieve unit details.');
+                renderError('Ошибка загрузки данных о команде');
             }
         }
 
     } catch (error) {
         console.error(error);
-        renderError('Failed to retrieve user profile.');
+        renderError('Ошибка загрузки');
     }
 });
 
@@ -54,14 +54,14 @@ function renderTeamInfo(team) {
     container.innerHTML = `
         <div class="team-card" style="height: auto; cursor: default; transform: none;">
             <div style="text-align: center; margin-bottom: 20px;">
-                <span class="team-id">UNIT ID: ${team.id}</span>
+                <span class="team-id">ID команды: ${team.id}</span>
                 <span class="highlight">${sanitize(teamName)}</span>
                 <span style="color: #666; font-size: 0.8rem;">STATUS: ACTIVE</span>
             </div>
             
             <div style="border-top: 1px dashed #333; padding-top: 20px; display: flex; justify-content: space-between;">
-                <button id="leaveBtn" class="btn-action">LEAVE UNIT</button>
-                <button id="deleteBtn" class="btn-action delete">DELETE UNIT</button>
+                <button id="leaveBtn" class="btn-action">Выйти с команды</button>
+                <button id="deleteBtn" class="btn-action delete">Удалить команду</button>
             </div>
         </div>
     `;
@@ -76,14 +76,14 @@ function renderError(msg) {
 }
 
 async function handleLeave() {
-    if (!confirm('Abort affiliation? You will leave this unit.')) return;
+    if (!confirm('Выйти с команды?')) return;
     
-    setStatus('Processing...', '');
+    setStatus('Загрузка...', '');
 
     try {
         // POST /api/v1/teams/teams/leave
         await apiClient.post('/api/v1/teams/teams/leave');
-        setStatus('You have left the unit.', 'success');
+        setStatus('Вы вышли с команды.', 'success');
         setTimeout(() => location.reload(), 1000);
     } catch (error) {
         console.error(error);
@@ -92,9 +92,9 @@ async function handleLeave() {
 }
 
 async function handleDelete(teamId) {
-    if (!confirm('WARNING: TERMINATE UNIT? This action cannot be undone.')) return;
+    if (!confirm('Предупреждение: Удалить команду?')) return;
 
-    setStatus('Deleting unit...', '');
+    setStatus('Удаление...', '');
 
     try {
         // DELETE /api/v1/teams/teams/{team_id}
@@ -103,7 +103,7 @@ async function handleDelete(teamId) {
         setTimeout(() => location.reload(), 1000);
     } catch (error) {
         console.error(error);
-        setStatus('Deletion Failed. You may not have clearance.', 'error');
+        setStatus('Удаление команды, ошибка, вы не являетесь владельцем', 'error');
     }
 }
 

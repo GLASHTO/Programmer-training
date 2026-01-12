@@ -3,38 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Main Menu // Code Arena</title>
-    <link rel="stylesheet" href="/src/css/menu.css">
+    <title>Главное меню</title>
+    <link rel="stylesheet" href="./src/css/menu.css">
 </head>
 <body>
 
     <div class="menu-container">
         <div class="stats-panel" id="statsPanel">
             <div class="stat-row">
-                <span class="stat-label">OPERATOR:</span>
-                <span class="stat-value" id="username">LOADING...</span>
+                <span class="stat-label">Пользователь:</span>
+                <span class="stat-value" id="username">Загрузка...</span>
             </div>
             <div class="stat-row">
-                <span class="stat-label">SCORE:</span>
+                <span class="stat-label">Очки:</span>
                 <span class="stat-value" id="score">---</span>
             </div>
              <div class="stat-row">
-                <span class="stat-label">TEAM:</span>
-                <span class="stat-value" id="teamName">NONE</span>
+                <span class="stat-label">Команда:</span>
+                <span class="stat-value" id="teamName">нет</span>
             </div>
         </div>
 
         <nav class="main-nav">
-            <button class="nav-btn" onclick="window.location.href='/game.html'">INITIATE GAME</button>
-            <button class="nav-btn" onclick="window.location.href='/teams.html'">JOIN TEAM</button>
-            <button class="nav-btn" onclick="window.location.href='/my-teams.html'">MY UNIT</button>
-            <button class="nav-btn" onclick="window.location.href='/profile.html'">PROFILE CONFIG</button>
-            <button class="nav-btn" onclick="window.location.href='/dashboard.html'">GLOBAL NETWORK</button>
+            <button class="nav-btn" onclick="window.location.href='/game.html'">Начать</button>
+            <button class="nav-btn" onclick="window.location.href='/teams.html'">Присоединиться к команде</button>
+            <button class="nav-btn" onclick="window.location.href='/my-teams.html'">Моя команда</button>
+            <button class="nav-btn" onclick="window.location.href='/profile.html'">Настройки профиля</button>
+            <button class="nav-btn" onclick="window.location.href='/dashboard.html'">Таблица лидеров</button>
             
-            <button class="nav-btn logout" id="logoutBtn">TERMINATE SESSION</button>
+            <button class="nav-btn logout" id="logoutBtn">Выход</button>
         </nav>
     </div>
 
-    <script type="module" src="/src/scripts/menu.js"></script>
+    <script type="module" src="./src/scripts/menu.js"></script>
 </body>
 </html>

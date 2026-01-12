@@ -1,5 +1,5 @@
 /* src/css/menu.css */
-@import './base.css'; /* Предполагаем наличие базовых переменных */
+@import './base.css';
 
 :root {
     --menu-width: 400px;

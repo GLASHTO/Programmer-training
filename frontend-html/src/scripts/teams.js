@@ -34,7 +34,6 @@ function renderTeams(teams) {
         card.className = 'team-card';
         
         // Предполагаем структуру: { "id": 1, "team_name": "Alpha" }
-        // Если поле имени отличается, нужно подправить (в спецификации TeamBase есть team_name)
         const teamName = team.team_name || team.name || 'Unnamed Unit';
 
         card.innerHTML = `

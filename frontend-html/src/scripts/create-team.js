@@ -8,12 +8,12 @@ createBtn.addEventListener('click', async () => {
     const name = nameInput.value.trim();
     
     // Сброс UI
-    msgBox.textContent = 'Processing...';
+    msgBox.textContent = 'Загрузка...';
     msgBox.style.color = '#fff';
     createBtn.disabled = true;
 
     if (!name) {
-        msgBox.textContent = 'Name required';
+        msgBox.textContent = 'Название команды';
         msgBox.style.color = '#ff0055';
         createBtn.disabled = false;
         return;
