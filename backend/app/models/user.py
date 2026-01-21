@@ -25,3 +25,5 @@ class User(Base):
     # cascade delete
     score = relationship("UserScore", back_populates="user", cascade="all, delete-orphan", uselist=False)
     submissions = relationship("Submission", back_populates="user", cascade="all, delete-orphan")
+
+    is_admin = Column(Boolean, default=False)

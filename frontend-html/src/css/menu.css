@@ -40,7 +40,7 @@ body {
     left: 10px;
     background: #050505;
     padding: 0 5px;
-    color: #666;
+    color: #ffffff;
     font-size: 0.7rem;
 }
 
@@ -50,7 +50,7 @@ body {
     font-size: 1.1rem;
 }
 
-.stat-label { color: #666; }
+.stat-label { color: #ffffff; }
 .stat-value { color: #00f3ff; text-shadow: 0 0 5px rgba(0, 243, 255, 0.3); }
 
 /* Navigation */
