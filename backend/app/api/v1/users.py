@@ -1,10 +1,14 @@
 from app.api.v1.auth import get_current_user
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from sqlalchemy import func
+
 from app.models import User, Team
+from app.models.submission import UserScore
 from app.core.database import get_db
 from app.core.security import hash_password,  verify_password
-from app.schemas.user import UserCreate, UserPasswChange, UserToTeam, OneUserOut
+from app.schemas.user import UserCreate, UserPasswChange, UserToTeam, OneUserOut, UserProfileOut
+from app.models.submission import Submission
 router = APIRouter(prefix="/users", tags=["Users"])
 
 
@@ -121,3 +125,34 @@ def delete_user(user_id: int, db: Session = Depends(get_db)):
     db.commit()
     
     return {"status": "ok", "message": f"User {user.username} deleted"}
+
+### Получить полные данные профиля пользователя с командой и очками
+@router.get("/{user_id}/profile", response_model=UserProfileOut)
+def get_user_profile(user_id: int, db: Session = Depends(get_db)):
+   
+    # Подзапрос для подсчета уникальных решенных задач пользователем
+    # Мы считаем только те сабмиты, где status == True (успешно)
+    solved_tasks_subquery = (
+        db.query(func.count(Submission.task_id.distinct()))
+        .filter(Submission.user_id == user_id, Submission.status == True)
+        .scalar_subquery()
+    )
+
+    user_data = (
+        db.query(
+            User.id,
+            User.username,
+            Team.team_name,
+            func.coalesce(UserScore.user_score, 0).label("score"),
+            func.coalesce(solved_tasks_subquery, 0).label("solved_tasks") # Добавляем подсчет
+        )
+        .outerjoin(Team, User.team_id == Team.id)
+        .outerjoin(UserScore, User.id == UserScore.user_id)
+        .filter(User.id == user_id)
+        .first()
+    )
+
+    if not user_data:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    return user_data

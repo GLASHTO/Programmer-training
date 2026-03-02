@@ -34,8 +34,11 @@ form.addEventListener('submit', async (e) => {
         registerBtn.disabled = false;
         msgBox.classList.add('error');
         console.log(error.response);
-        msgBox.textContent = error.response.data.detail;
-        
+        if (error.response.data.detail == "User already exists"){
+        msgBox.textContent = "Пользователь уже существует";
+        } else {
+            msgBox.textContent = error.response.data.detail;
+        }
         // Если ошибка авторизации - чистим мусор
         localStorage.clear();
     }

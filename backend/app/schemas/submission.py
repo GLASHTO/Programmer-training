@@ -23,3 +23,15 @@ class SubmissionOut(BaseModel):
     class Config:
         from_attributes = True
 
+# схема для таблицы пользователей
+class UserRankOut(BaseModel):
+    rank: int
+    username: str
+    score: int
+    team_name: str | None = None # Полезно показать, в какой команде игрок
+
+# схема для таблицы пользователей
+class TeamRankOut(BaseModel):
+    rank: int
+    team_name: str
+    score: int

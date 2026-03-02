@@ -21,10 +21,10 @@ form.addEventListener('submit', async (e) => {
         const targetUser = users.find(u => u.username === username);
 
         if (!targetUser) {
-            throw new Error('Identity not found in registry');
+            throw new Error('User not found');
         }
 
-        msgBox.textContent = 'Identity found. Overriding credentials...';
+        msgBox.textContent = 'Смена пароля...';
 
         // 2. Отправляем запрос на смену пароля
         await apiClient.put('/api/v1/users/users/new_password', {
@@ -32,7 +32,7 @@ form.addEventListener('submit', async (e) => {
             password: newPassword
         });
 
-        msgBox.textContent = 'Access Code Reset Successful.';
+        msgBox.textContent = 'Пароль изменен';
         msgBox.classList.add('success');
 
         // Редирект на логин
@@ -44,11 +44,13 @@ form.addEventListener('submit', async (e) => {
         console.error(error);
         resetBtn.disabled = false;
         msgBox.classList.add('error');
-
-        if (error.message === 'Identity not found in registry') {
-            msgBox.textContent = 'Target Identity Not Found';
+        if (error.response.data.detail == "New password cannot be the same as the old password"){
+            msgBox.textContent = 'Новый пароль не может быть таким же, как и старый';
+        }
+        else if (error.message === 'User not found') {
+            msgBox.textContent = 'Пользователь не найден';
         } else {
-            msgBox.textContent = 'Override Failed (Server Error)';
+            msgBox.textContent = 'Server Error 505';
         }
     }
 });

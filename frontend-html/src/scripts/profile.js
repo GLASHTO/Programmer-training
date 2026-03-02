@@ -11,16 +11,20 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Загрузка данных
     try {
-        const response = await apiClient.get(`/api/v1/users/users/${userId}`);
+        const response = await apiClient.get(`/api/v1/users/users/${userId}/profile`);
         const user = response.data;
 
         document.getElementById('username').textContent = user.username;
-        document.getElementById('score').textContent = user.score !== undefined ? user.score : 0;
         document.getElementById('userId').textContent = user.id;
+        document.getElementById('score').textContent = user.score;
+        document.getElementById('team').textContent = user.team_name || 'Solo (Нет команды)';
+        
+        // ВЫВОДИМ КОЛИЧЕСТВО РЕШЕННЫХ ЗАДАЧ
+        document.getElementById('solvedTasks').textContent = user.solved_tasks;
 
     } catch (error) {
         console.error(error);
-        msgBox.textContent = 'Ошибка в загрузке данных команды';
+        msgBox.textContent = 'SYS_ERROR: Не удалось загрузить данные профиля';
         msgBox.className = 'msg-box error';
     }
 
@@ -33,26 +37,24 @@ document.addEventListener('DOMContentLoaded', async () => {
         msgBox.className = 'msg-box';
 
         if (!p1 || !p2) {
-            msgBox.textContent = 'Поля не могут быть пустыми';
+            msgBox.textContent = 'ПОЛЯ НЕ МОГУТ БЫТЬ ПУСТЫМИ';
             msgBox.classList.add('error');
             return;
         }
 
         if (p1 !== p2) {
-            msgBox.textContent = 'Пароли не совпадают';
+            msgBox.textContent = 'ОШИБКА: ПАРОЛИ НЕ СОВПАДАЮТ';
             msgBox.classList.add('error');
             return;
         }
 
         try {
-            // PUT /api/v1/users/users/new_password
-            // Payload: { id: int, password: str }
             await apiClient.put('/api/v1/users/users/new_password', {
                 id: parseInt(userId),
                 password: p1
             });
 
-            msgBox.textContent = 'Данные обновлены';
+            msgBox.textContent = 'ДОСТУП ОБНОВЛЕН (SUCCESS)';
             msgBox.classList.add('success');
             
             // Очистка полей
@@ -62,8 +64,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         } catch (error) {
             console.error(error);
             const errDetail = error.response?.data?.detail;
-            msgBox.textContent = errDetail ? JSON.stringify(errDetail) : 'Обновление прошло не удачно';
+            if (error.response.data.detail == "New password cannot be the same as the old password"){
+                msgBox.textContent = 'Новый пароль не может быть таким же, как и старый';
+                msgBox.classList.add('error');
+            } else {
+            msgBox.textContent = errDetail ? JSON.stringify(errDetail) : 'ОШИБКА ОБНОВЛЕНИЯ';
             msgBox.classList.add('error');
+        }
         }
     });
 });

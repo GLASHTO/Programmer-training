@@ -42,3 +42,10 @@ class UserToTeam(BaseModel):
 class Token(BaseModel):
     access_token: str
     token_type: str = "bearer"
+
+class UserProfileOut(BaseModel):
+    id: int
+    username: str
+    team_name: Optional[str] = None
+    score: int
+    solved_tasks: int

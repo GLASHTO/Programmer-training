@@ -3,44 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Профиль</title>
-    <link rel="stylesheet" href="/src/css/profile.css">
+    <title>Operator Profile</title>
+    <link rel="stylesheet" href="./src/css/profile.css">
 </head>
 <body>
 
-    <div class="profile-container">
-        <div class="header-row">
-            <h2 class="page-title">Профиль пользователя</h2>
-            <a href="/menu.html" class="btn-back">&lt; BACK</a>
+    <div class="profile-layout">
+        <header class="dash-header">
+            <h1 class="dash-title">OPERATOR PROFILE</h1>
+            <a href="/menu.html" class="btn-home">&lt; Меню</a>
+        </header>
+
+        <div class="profile-card">
+            <div class="info-section">
+                <div class="info-row">
+                    <span class="label">IDENTITY (Имя):</span>
+                    <span class="value" id="username">LOADING...</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">UNIT (Команда):</span>
+                    <span class="value" id="team">LOADING...</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">TOTAL SCORE (Очки):</span>
+                    <span class="value score" id="score">---</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">TASKS RESOLVED (Решено Задач):</span>
+                    <span class="value" id="solvedTasks">---</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">DATABASE ID:</span>
+                    <span class="value" id="userId">---</span>
+                </div>
+            </div>
         </div>
 
-        <div class="info-section">
-            <div class="info-row">
-                <span class="label">Имя пользователя</span>
-                <span class="value" id="username">Загрузка...</span>
+            <div class="security-section">
+                <div class="sec-title">SECURITY OVERRIDE (Смена пароля)</div>
+                
+                <div class="form-group">
+                    <input type="password" id="newPass" class="input-dark" placeholder="ENTER NEW PASSWORD">
+                </div>
+                <div class="form-group">
+                    <input type="password" id="confirmPass" class="input-dark" placeholder="CONFIRM NEW PASSWORD">
+                </div>
+                
+                <button id="saveBtn" class="btn-action">UPDATE CREDENTIALS</button>
+                <div id="msgBox" class="msg-box"></div>
             </div>
-            <div class="info-row">
-                <span class="label">Очки</span>
-                <span class="value score" id="score">---</span>
-            </div>
-            <div class="info-row">
-                <span class="label">ID пользователя в базе</span>
-                <span class="value" id="userId">---</span>
-            </div>
-        </div>
-
-        <div class="security-section">
-            <div class="sec-title">Забыли пароль?</div>
-            
-            <div class="form-group">
-                <input type="password" id="newPass" class="input-dark" placeholder="NEW PASSWORD">
-            </div>
-            <div class="form-group">
-                <input type="password" id="confirmPass" class="input-dark" placeholder="CONFIRM PASSWORD">
-            </div>
-            
-            <button id="saveBtn" class="btn-action">Изменить пароль</button>
-            <div id="msgBox" class="msg-box"></div>
         </div>
     </div>
 

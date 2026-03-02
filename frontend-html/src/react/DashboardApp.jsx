@@ -15,38 +15,15 @@ const DashboardApp = () => {
     const fetchData = async () => {
         setLoading(true);
         try {
-            // Для обоих видов всегда нужны пользователи (чтобы считать очки)
-            const usersRes = await apiClient.get('/api/v1/users/users/');
-            const users = usersRes.data || [];
+            // Теперь мы просто дергаем нужный эндпоинт в зависимости от вкладки
+            const endpoint = activeTab === 'users' 
+                ? '/api/v1/leaderboard/leaderboard/users' 
+                : '/api/v1/leaderboard/leaderboard/teams';
 
-            if (activeTab === 'users') {
-                // Сортировка пользователей по очкам
-                console.log(users);
-                const sortedUsers = users.sort((a, b) => (b.score || 0) - (a.score || 0));
-                setData(sortedUsers);
-            } else {
-                // Для команд нужно получить список команд и посчитать сумму очков их участников
-                const teamsRes = await apiClient.get('/api/v1/teams/teams/');
-                const teams = teamsRes.data || [];
-
-                // Группировка очков пользователей по team_id
-                const teamScores = {};
-                users.forEach(u => {
-                    if (u.team_id) {
-                        teamScores[u.team_id] = (teamScores[u.team_id] || 0) + (u.score || 0);
-                    }
-                });
-
-                // Формирование итогового массива команд с очками
-                const teamsWithScores = teams.map(t => ({
-                    ...t,
-                    total_score: teamScores[t.id] || 0
-                }));
-
-                // Сортировка команд
-                const sortedTeams = teamsWithScores.sort((a, b) => b.total_score - a.total_score);
-                setData(sortedTeams);
-            }
+            const response = await apiClient.get(endpoint);
+            // Бэкенд уже все посчитал и отсортировал, просто кладем в стейт
+            setData(response.data || []);
+            
         } catch (error) {
             console.error("Dashboard fetch error:", error);
             setData([]);
@@ -93,27 +70,31 @@ const DashboardApp = () => {
                             <tr>
                                 <th className="rank-col">#</th>
                                 <th>{activeTab === 'users' ? 'IDENTITY' : 'UNIT DESIGNATION'}</th>
-                                {activeTab === 'teams' && <th>UNIT ID</th>}
+                                {/* Бонус: теперь мы можем показывать команду прямо в таблице игроков */}
+                                {activeTab === 'users' && <th>UNIT</th>}
                                 <th className="score-col">SCORE</th>
                             </tr>
                         </thead>
                         <tbody>
                             {data.length > 0 ? (
                                 data.map((item, index) => (
-                                    <tr key={item.id}>
+                                    // В качестве ключа используем username или team_name, так как id мы из бэка не передаем
+                                    <tr key={activeTab === 'users' ? item.username : item.team_name}>
                                         <td className={`rank-col ${getRankStyle(index)}`}>
-                                            {index + 1}
+                                            {item.rank}
                                         </td>
                                         <td>
-                                            {activeTab === 'users' ? item.username : (item.team_name || item.name)}
+                                            {activeTab === 'users' ? item.username : item.team_name}
                                         </td>
-                                        {activeTab === 'teams' && (
+                                        
+                                        {activeTab === 'users' && (
                                             <td style={{color: '#666', fontSize: '0.8rem'}}>
-                                                {item.id}
+                                                {item.team_name || 'Solo'}
                                             </td>
                                         )}
+
                                         <td className="score-col">
-                                            {activeTab === 'users' ? (item.score || 0) : item.total_score}
+                                            {item.score}
                                         </td>
                                     </tr>
                                 ))

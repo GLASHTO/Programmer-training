@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const elUsername = document.getElementById('username');
     const elScore = document.getElementById('score');
     const elTeam = document.getElementById('teamName');
+    const elTasks = document.getElementById('solvedTasks');
     const btnLogout = document.getElementById('logoutBtn');
 
     // Выход
@@ -22,43 +23,93 @@ document.addEventListener('DOMContentLoaded', async () => {
         window.location.href = '/index.html';
     });
 
-    // Загрузка данных
+    // Загрузка данных с нового эндпоинта
     try {
-        const response = await apiClient.get(`/api/v1/users/users/${userId}`);
+        const response = await apiClient.get(`/api/v1/users/users/${userId}/profile`);
         const user = response.data;
-        // Отображение данных
-        elUsername.textContent = user.username || 'Неизвестно';
         
-        // Если у пользователя score не больше 0, то отобразить 0
-        elScore.textContent = user.score !== undefined ? user.score : '0';
-
-        // Логика отображения команды, запрашиваем данные команды ТОЛЬКО если есть ID
-        if (user.team_id !== null) {
-            try {
-                const teamResponse = await apiClient.get(`/api/v1/teams/teams/${user.team_id}`);
-                
-                // Если API возвращает объект с team_name, берем его. Иначе fallback на ID.
-                const teamName = teamResponse.data.team_name || teamResponse.data.name;
-                elTeam.textContent = teamName || `ID команды: ${user.team_id}`;
-                
-            } catch (teamError) {
-                // Если не удалось загрузить название команды, оставляем ID
-                console.warn('Не удалось загрузить название', teamError);
-                elTeam.textContent = `ID: ${user.team_id}`;
-            }
-        } else {
-            elTeam.textContent = 'Никуда не вступал'; 
-        }
+        // Отображение данных
+        elUsername.textContent = user.username || 'UNKNOWN_ENTITY';
+        elScore.textContent = user.score || 0;
+        elTeam.textContent = user.team_name || 'NO_UNIT_ASSIGNED';
+        elTasks.textContent = user.solved_tasks || 0;
 
     } catch (error) {
         console.error('Data fetch error:', error);
-        elUsername.textContent = 'CONN_ERR';
+        elUsername.textContent = 'SYS_ERROR';
         elScore.textContent = 'ERR';
+        elTeam.textContent = 'ERR';
+        elTasks.textContent = 'ERR';
         
         // Если 401 - токен протух
-        if (error.response && error.response.status === 401) {
+        if (error.response?.status === 401) {
             localStorage.clear();
             window.location.href = '/index.html';
         }
     }
+    
+        // === ЛОГИКА УМНОГО СТАРТА ИГРЫ ===
+        const btnStart = document.getElementById('btnStartGame');
+        const modalNoTasks = document.getElementById('noTasksModal');
+        const btnRepeat = document.getElementById('btnRepeatLast');
+
+        btnStart.addEventListener('click', async () => {
+            // Меняем текст кнопки, чтобы показать процесс загрузки
+            const originalText = btnStart.textContent;
+            btnStart.textContent = '[ SCANNING_TASKS... ]';
+
+            // Берем токен из памяти
+            const token = localStorage.getItem('token');
+            try {
+                                                
+                // Добавляем слеш на конце "/" и явно передаем headers
+                const response2 = await apiClient.get('/api/v1/tasks/tasks/next/', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                const data = response2.data;
+
+                if (data.status === 'found') {
+                    // Идеально: нашли следующую задачу
+                    window.location.href = `/game.html?taskId=${data.task_id}`;
+                } else {
+                    // Задач больше нет
+                    btnStart.textContent = originalText;
+                    modalNoTasks.style.display = 'flex'; // Показываем модалку
+                    // Сохраняем ID последней задачи внутри кнопки повтора
+                    btnRepeat.dataset.taskId = data.last_task_id;
+                }
+            } catch (error) {
+                console.error('Ошибка при поиске задачи', error);
+                // Если эндпоинт отвалился, просто кидаем в общий список выбора
+                // window.location.href = '/tasks.html';
+                
+                // Выводим текст ошибки из бэкенда, чтобы понимать причину
+                if (error.response) {
+                    console.error("Backend response:", error.response.data);
+                }
+            }
+
+        });
+
+        // Обработчики кнопок внутри модального окна
+        btnRepeat.addEventListener('click', (e) => {
+            const lastId = e.target.dataset.taskId;
+            if (lastId && lastId !== "0") {
+                window.location.href = `/game.html?taskId=${lastId}`;
+            } else {
+                // Если пользователь вообще ни одной задачи еще не решил, но задач в БД 0
+                window.location.href = '/tasks.html';
+            }
+        });
+
+        document.getElementById('btnGoToTasks').addEventListener('click', () => {
+            window.location.href = '/tasks.html';
+        });
+
+        document.getElementById('btnCloseModal').addEventListener('click', () => {
+            modalNoTasks.style.display = 'none';
+        });
+
 });

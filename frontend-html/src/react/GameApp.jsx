@@ -5,60 +5,130 @@ import apiClient from '../api/client';
 import '../css/game.css';
 
 // Компонент Таймера
-const Timer = ({ initialTime }) => {
-    const [timeLeft, setTimeLeft] = useState(initialTime || 3600);
+const Timer = ({ initialTime, onTimeUp }) => {
+    // Используем null, чтобы понимать, загрузилась ли уже задача
+    const [timeLeft, setTimeLeft] = useState(null);
 
     useEffect(() => {
-        if (!initialTime) return;
-        setTimeLeft(initialTime);
+        if (initialTime !== undefined && initialTime !== null) {
+            setTimeLeft(initialTime);
+        }
     }, [initialTime]);
 
     useEffect(() => {
-        if (timeLeft <= 0) return;
+        // Если таймер еще не инициализирован, ничего не делаем
+        if (timeLeft === null) return;
+
+        // Если время вышло, останавливаемся и вызываем колбэк
+        if (timeLeft <= 0) {
+            if (onTimeUp) onTimeUp();
+            return;
+        }
+
         const intervalId = setInterval(() => {
             setTimeLeft((prev) => prev - 1);
         }, 1000);
+
         return () => clearInterval(intervalId);
-    }, [timeLeft]);
+    }, [timeLeft, onTimeUp]);
 
     const formatTime = (seconds) => {
+        if (seconds === null) return "--:--";
         const m = Math.floor(seconds / 60);
         const s = seconds % 60;
         return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
     };
 
-    return <div className="timer">TIME: {formatTime(timeLeft)}</div>;
+    const isCritical = timeLeft !== null && timeLeft < 60 && timeLeft > 0; 
+
+    return <div className={`timer ${isCritical ? 'timer-critical' : ''}`}>TIME: {formatTime(timeLeft)}</div>;
 };
 
 // Основной компонент игры
 const GameApp = () => {
+    // Новые стейты для работы со списком задач
+    const [tasks, setTasks] = useState([]);
+    const [currentTaskIndex, setCurrentTaskIndex] = useState(0);
+    
     const [task, setTask] = useState(null);
     const [code, setCode] = useState('// Write your solution here\n');
-    const [status, setStatus] = useState(null); // { type: 'success' | 'error', msg: string }
+    const [status, setStatus] = useState(null); 
     const [loading, setLoading] = useState(false);
+    
+    // Стейт для управления модальным окном
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
+    // Внутри компонента GameApp, там где у тебя объявлены другие useState:
+    const [showTimeoutModal, setShowTimeoutModal] = useState(false);
 
-    // Загрузка задачи при старте
+    // Функция, которая сработает, когда таймер достигнет 0
+    const handleTimeUp = () => {
+        setShowTimeoutModal(true);
+    
+    // Автоматически выкидываем пользователя на страницу выбора задач через 3 секунды
+    setTimeout(() => {
+        window.location.href = '/tasks.html';
+    }, 3000);
+    };
+
+
+    // Загрузка списка задач при старте
     useEffect(() => {
-        const fetchTask = async () => {
+        const fetchTasks = async () => {
             try {
-                // Получаем список задач и берем первую (для упрощения, т.к. логика выбора не описана)
+                // Читаем параметры из URL (например, ?taskId=5)
+                const urlParams = new URLSearchParams(window.location.search);
+                const requestedTaskId = urlParams.get('taskId');
+
                 const response = await apiClient.get('/api/v1/tasks/tasks/');
-                if (response.data && response.data.length > 0) {
-                    setTask(response.data[0]);
+                const allTasks = response.data;
+
+                if (allTasks && allTasks.length > 0) {
+                    setTasks(allTasks);
+
+                    if (requestedTaskId) {
+                        // Если передан ID, ищем эту задачу в массиве
+                        const foundIndex = allTasks.findIndex(t => t.id === parseInt(requestedTaskId));
+                        
+                        if (foundIndex !== -1) {
+                            setCurrentTaskIndex(foundIndex);
+                            setTask(allTasks[foundIndex]);
+                        } else {
+                            setStatus({ type: 'error', msg: 'Task not found. System error.' });
+                        }
+                    } else {
+                        // Если зашли просто на /game.html без ID, даем первую задачу
+                        setCurrentTaskIndex(0);
+                        setTask(allTasks[0]);
+                    }
                 } else {
-                    setStatus({ type: 'error', msg: 'No tasks available.' });
+                    setStatus({ type: 'error', msg: 'No tasks available in database.' });
                 }
             } catch (error) {
-                console.error("Failed to load task", error);
+                console.error("Failed to load tasks", error);
                 setStatus({ type: 'error', msg: 'Error loading task data.' });
             }
         };
 
-        fetchTask();
+        fetchTasks();
     }, []);
 
     const handleBack = () => {
         window.location.href = '/menu.html';
+    };
+
+    // Логика перехода к следующей задаче
+    const handleNextTask = () => {
+        const nextIndex = currentTaskIndex + 1;
+        if (nextIndex < tasks.length) {
+            setCurrentTaskIndex(nextIndex);
+            setTask(tasks[nextIndex]);
+            setCode('// Write your solution here\n'); // Сбрасываем код
+            setStatus(null); // Очищаем статус
+            setShowSuccessModal(false); // Закрываем модалку
+        } else {
+            alert("Вы решили все доступные задачи!");
+            window.location.href = '/menu.html';
+        }
     };
 
     const handleSubmit = async () => {
@@ -67,35 +137,45 @@ const GameApp = () => {
         setStatus(null);
 
         try {
+            // === ОЧИСТКА КОДА ===
+            // Удаляем:
+            // 1. Многострочные комментарии /* ... */
+            // 2. Однострочные JS/C++ комментарии // ...
+            // 3. Однострочные Python комментарии # ...
+            const cleanCode = code.replace(/\/\*[\s\S]*?\*\/|\/\/.*|#.*/g, '').trim();
+
             const payload = {
                 task_id: task.id,
-                code: code
+                code: cleanCode // Отправляем очищенный код
             };
             
-            // 1. Сохраняем ответ сервера в переменную
             const response = await apiClient.post('/api/v1/games/submit', payload);
-            const result = response.data; // { status: true, output: "string", error: null, ... }
+            const result = response.data;
             
-            // 2. Проверяем поле status из твоего JSON
+            // --- ТВОЙ НОВЫЙ БЛОК КОДА ---
             if (result.status === true) {
-                // Если решение верное
+                // Формируем сообщение в зависимости от того, решалась ли задача ранее
+                let successMsg = `SUCCESS! Output: ${result.output}`;
+                
+                if (result.already_solved) {
+                    successMsg = `SUCCESS! Output: ${result.output} (Задача уже была решена ранее. Новые баллы не начислены.)`;
+                }
+
                 setStatus({ 
                     type: 'success', 
-                    msg: `SUCCESS! Output: ${result.output}` 
+                    msg: successMsg 
                 });
+                
+                // Показываем модальное окно
+                setShowSuccessModal(true);
             } else {
-                // Если решение неверное или код упал с ошибкой
-                // Если есть error (из stderr), показываем его, иначе показываем output (неверный вывод)
+                // Если решение неверное
                 const errorText = result.error ? result.error : `Wrong Answer. Got: ${result.output}`;
-                setStatus({ 
-                    type: 'error', 
-                    msg: errorText 
-                });
+                setStatus({ type: 'error', msg: errorText });
             }
 
         } catch (error) {
             console.error(error);
-            // Обработка ошибок сети или 500-х ошибок сервера
             const errorMsg = error.response?.data?.detail 
                 ? JSON.stringify(error.response.data.detail) 
                 : 'Connection Failed';
@@ -105,21 +185,54 @@ const GameApp = () => {
         }
     };
 
-    
     if (!task && !status) return <div className="game-container" style={{padding: 20}}>Loading system...</div>;
 
     return (
         <div className="game-container">
-            {/* Header */}
+            {/* --- МОДАЛЬНОЕ ОКНО ТАЙМАУТА --- */}
+            {showTimeoutModal && (
+                <div className="modal-overlay">
+                    <div className="modal-content" style={{ borderColor: '#ff0055', boxShadow: '0 0 30px rgba(255, 0, 85, 0.3)' }}>
+                        <h2 className="modal-title" style={{ color: '#ff0055' }}>ВНИМАНИЕ!</h2>
+                        <p style={{ fontSize: '1.2rem' }}>ВРЕМЯ ВЫШЛО!</p>
+                        <p style={{ color: '#ffaa00' }}>СОЕДИНЕНИЕ ПРЕРВАНО...</p>
+                    </div>
+                </div>
+            )}
+            {/* --- МОДАЛЬНОЕ ОКНО --- */}
+            {showSuccessModal && (
+                <div className="modal-overlay">
+                    <div className="modal-content">
+                        <h2 className="modal-title">СТАТУС ЗАДАЧИ</h2>
+                        <p>Задача успешно решена!</p>
+                        
+                        {/* Показываем статус начисления */}
+                        {status?.msg?.includes('уже была решена') ? (
+                            <p style={{color: '#ffaa00', fontSize: '0.9rem'}}>Повторное решение. Баллы не начислены.</p>
+                        ) : (
+                            <p style={{color: '#00f3ff', fontSize: '0.9rem'}}>Баллы успешно зачислены в систему.</p>
+                        )}
+                        
+                        <div className="modal-actions">
+                            <button className="btn-action" onClick={handleNextTask}>
+                                [ Следующая задача ]
+                            </button>
+                            <button className="btn-action logout" onClick={handleBack}>
+                                [ В меню ]
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+            
+
             <header className="game-header">
-                <button className="btn-back" onClick={handleBack}>&lt; EXIT</button>
-                <Timer initialTime={task ? task.task_time : 0} />
-                <div style={{width: 80}}></div> {/* Spacer for centering */}
+                <button className="btn-back" onClick={handleBack}>&lt; НАЗАД</button>
+                <Timer initialTime={task ? task.task_time : null} onTimeUp={handleTimeUp} />
+                <div style={{width: 80}}></div> 
             </header>
 
-            {/* Content */}
             <div className="game-content">
-                {/* Left: Task Info */}
                 <aside className="task-panel">
                     {task ? (
                         <>
@@ -142,7 +255,6 @@ const GameApp = () => {
                     )}
                 </aside>
 
-                {/* Right: Editor */}
                 <main className="editor-area">
                     <div className="editor-wrapper">
                         <Editor
@@ -160,7 +272,6 @@ const GameApp = () => {
                         />
                     </div>
                     
-                    {/* Control Panel */}
                     <footer className="control-panel">
                         {status && (
                             <div className={`status-msg ${status.type}`}>
@@ -181,7 +292,6 @@ const GameApp = () => {
     );
 };
 
-// Монтирование React приложения
 const container = document.getElementById('root');
 if (container) {
     const root = createRoot(container);

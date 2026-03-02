@@ -5,19 +5,55 @@ const searchInput = document.getElementById('searchInput');
 const statusMsg = document.getElementById('statusMsg');
 
 let allTeams = [];
+let isUserInTeam = false; // Флаг: состоит ли пользователь в команде
 
 document.addEventListener('DOMContentLoaded', () => {
-    loadTeams();
+    initPage();
 });
 
-async function loadTeams() {
+// Единая функция инициализации страницы
+async function initPage() {
+    const userId = localStorage.getItem('user_id');
+    
+    if (!userId) {
+        window.location.href = '/index.html';
+        return;
+    }
+
     try {
-        const response = await apiClient.get('/api/v1/teams/teams/');
-        allTeams = response.data; // Ожидаем массив объектов [{id, team_name}, ...]
+        // 1. Узнаем статус пользователя (чтобы скрыть кнопки)
+        const userRes = await apiClient.get(`/api/v1/users/users/${userId}/profile`);
+        if (userRes.data && userRes.data.team_name) {
+            isUserInTeam = true;
+        }
+
+        // 2. Загружаем команды и их баллы параллельно для скорости
+        const [teamsRes, leaderboardRes] = await Promise.all([
+            apiClient.get('/api/v1/teams/teams/'),
+            apiClient.get('/api/v1/leaderboard/leaderboard/teams')
+        ]);
+
+        const basicTeams = teamsRes.data; // [{id: 1, team_name: "Alpha"}]
+        const leaderboard = leaderboardRes.data; // [{rank: 1, team_name: "Alpha", score: 150}]
+
+        // 3. Объединяем данные (добавляем очки к базовым данным команд)
+        allTeams = basicTeams.map(team => {
+            const teamName = team.team_name || team.name;
+            const leaderData = leaderboard.find(l => l.team_name === teamName);
+            return {
+                ...team,
+                score: leaderData ? leaderData.score : 0 // Если команды нет в топе, ставим 0
+            };
+        });
+
+        // 4. Сортируем по очкам (по убыванию), чтобы самые сильные были первыми
+        allTeams.sort((a, b) => b.score - a.score);
+
         renderTeams(allTeams);
+
     } catch (error) {
         console.error(error);
-        teamsGrid.innerHTML = '<div style="color: #ff0055;">ERROR: UNABLE TO FETCH DATA</div>';
+        teamsGrid.innerHTML = '<div style="color: #ff0055; text-align: center; padding: 20px; border: 1px dashed #ff0055;">ERROR: UNABLE TO FETCH DATA STREAMS</div>';
     }
 }
 
@@ -25,7 +61,7 @@ function renderTeams(teams) {
     teamsGrid.innerHTML = '';
 
     if (teams.length === 0) {
-        teamsGrid.innerHTML = '<div style="color: #666;">NO UNITS DETECTED</div>';
+        teamsGrid.innerHTML = '<div style="color: #666; text-align: center; padding: 20px;">NO UNITS DETECTED</div>';
         return;
     }
 
@@ -33,21 +69,33 @@ function renderTeams(teams) {
         const card = document.createElement('div');
         card.className = 'team-card';
         
-        // Предполагаем структуру: { "id": 1, "team_name": "Alpha" }
         const teamName = team.team_name || team.name || 'Unnamed Unit';
 
+        // Формируем блок действий в зависимости от статуса игрока
+        const actionHtml = isUserInTeam 
+            ? `<span style="color: #666; font-size: 0.8rem;">[ Вы в команде ]</span>`
+            : `<button class="btn-action" style="padding: 5px 15px;" onclick="window.handleJoin(${team.id}, '${sanitize(teamName)}')">[ JOIN ]</button>`;
+
+        // Добавил стили прямо сюда, чтобы карточки сразу выглядели в стиле кибер-терминала
         card.innerHTML = `
-            <h3 class="team-name">${sanitize(teamName)}</h3>
-            <span class="team-id">ID: ${team.id}</span>
-            <div class="team-actions">
-                <button class="btn-action" onclick="window.handleJoin(${team.id}, '${sanitize(teamName)}')">JOIN</button>
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed #333; padding-bottom: 10px; margin-bottom: 15px;">
+                <h3 class="team-name" style="margin: 0; color: #e0e0e0; font-size: 1.2rem;">${sanitize(teamName)}</h3>
+                <span class="team-score" style="color: #00f3ff; font-weight: bold; text-shadow: 0 0 5px rgba(0,243,255,0.3);">
+                    ${team.score} PTS
+                </span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+                <span class="team-id" style="color: #666; font-size: 0.8rem;">ID: ${team.id}</span>
+                <div class="team-actions">
+                    ${actionHtml}
+                </div>
             </div>
         `;
         teamsGrid.appendChild(card);
     });
 }
 
-// Простая защита от XSS при рендеринге имен
+// Защита от XSS
 function sanitize(str) {
     if (!str) return '';
     return str.replace(/[&<>"']/g, function(m) {
@@ -65,35 +113,27 @@ searchInput.addEventListener('input', (e) => {
     renderTeams(filtered);
 });
 
-// Глобальная функция для обработки клика (так как onclick в HTML не видит модуль)
+// Обработка вступления
 window.handleJoin = async (teamId, teamName) => {
     const userId = localStorage.getItem('user_id');
     
-    if (!userId) {
-        window.location.href = '/index.html';
+    if (!confirm(`CONFIRM ATTACHMENT TO UNIT: "${teamName}"?`)) {
         return;
     }
 
-    if (!confirm(`Confirm attachment to unit "${teamName}"?`)) {
-        return;
-    }
-
-    statusMsg.textContent = 'Processing request...';
+    statusMsg.textContent = 'PROCESSING DIRECTIVE...';
     statusMsg.className = 'status-bar';
 
     try {
-        // PUT /api/v1/users/users/to_team
-        // Body: { user_id, team_id }
-        // Headers: Authorization (handled by client.js)
         await apiClient.put('/api/v1/users/users/to_team', {
             user_id: parseInt(userId),
             team_id: teamId
         });
 
-        statusMsg.textContent = `Successfully joined ${teamName}.`;
+        statusMsg.textContent = `SUCCESS: ATTACHED TO ${teamName}.`;
         statusMsg.className = 'status-bar success';
 
-        // Обновляем локальные данные о команде, если нужно, или просто редиректим
+        // Через секунду перекидываем на страницу "Моя команда"
         setTimeout(() => {
              window.location.href = '/my-teams.html';
         }, 1000);
@@ -103,9 +143,9 @@ window.handleJoin = async (teamId, teamName) => {
         statusMsg.className = 'status-bar error';
         
         if (error.response && error.response.status === 403) {
-             statusMsg.textContent = 'Access Denied: You are already in a team or banned.';
+             statusMsg.textContent = 'ACCESS DENIED: ALREADY IN A TEAM OR BANNED.';
         } else {
-             statusMsg.textContent = 'Join Failed. ' + (error.response?.data?.detail || '');
+             statusMsg.textContent = 'JOIN FAILED. ' + (error.response?.data?.detail || '');
         }
     }
 };

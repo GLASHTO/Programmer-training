@@ -3,36 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Главное меню</title>
+    <title>Меню</title>
     <link rel="stylesheet" href="./src/css/menu.css">
 </head>
 <body>
 
     <div class="menu-container">
+        <header class="menu-header">
+            <h1 class="sys-title">МЕНЮ</h1>
+        </header>
+
         <div class="stats-panel" id="statsPanel">
             <div class="stat-row">
-                <span class="stat-label">Пользователь:</span>
-                <span class="stat-value" id="username">Загрузка...</span>
+                <span class="stat-label">ПРОФИЛЬ</span>
+                <span class="stat-value" id="username">ЗАГРУЗКА...</span>
             </div>
             <div class="stat-row">
-                <span class="stat-label">Очки:</span>
-                <span class="stat-value" id="score">---</span>
+                <span class="stat-label">КОМАНДЫ:</span>
+                <span class="stat-value" id="teamName">---</span>
             </div>
-             <div class="stat-row">
-                <span class="stat-label">Команда:</span>
-                <span class="stat-value" id="teamName">нет</span>
+            <div class="stat-row">
+                <span class="stat-label">ОЧКИ:</span>
+                <span class="stat-value highlight" id="score">---</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">КОЛИЧЕСТВО РЕШЕННЫХ ЗАДАЧ:</span>
+                <span class="stat-value" id="solvedTasks">---</span>
             </div>
         </div>
 
         <nav class="main-nav">
-            <button class="nav-btn" onclick="window.location.href='/game.html'">Начать</button>
-            <button class="nav-btn" onclick="window.location.href='/teams.html'">Присоединиться к команде</button>
-            <button class="nav-btn" onclick="window.location.href='/my-teams.html'">Моя команда</button>
-            <button class="nav-btn" onclick="window.location.href='/profile.html'">Настройки профиля</button>
-            <button class="nav-btn" onclick="window.location.href='/dashboard.html'">Таблица лидеров</button>
+            <button class="nav-btn" id="btnStartGame">[ СТАРТ ]</button>
+            <button class="nav-btn" onclick="window.location.href='/tasks.html'">[ СПИСОК ЗАДАЧ ]</button>
+            <button class="nav-btn" onclick="window.location.href='/teams.html'">[ ПОИСК КОМАНДЫ ]</button>
+            <button class="nav-btn" onclick="window.location.href='/my-teams.html'">[ МОЯ КОМАНДА ]</button>
+            <button class="nav-btn" onclick="window.location.href='/dashboard.html'">[ ГЛОБАЛЬНЫЙ РЕЙТИНГ ]</button>
+            <button class="nav-btn" onclick="window.location.href='/profile.html'">[ НАСТРОЙКИ ]</button>
             
-            <button class="nav-btn logout" id="logoutBtn">Выход</button>
+            <button class="nav-btn logout" id="logoutBtn">[ ВЫХОД ]</button>
         </nav>
+    </div>
+
+    <div id="noTasksModal" class="modal-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(4px);">
+        <div class="modal-content" style="background: #0a0a0a; border: 1px solid #ffaa00; padding: 30px; text-align: center; box-shadow: 0 0 20px rgba(255, 170, 0, 0.2); max-width: 400px;">
+            <h2 style="color: #ffaa00; margin-top: 0; letter-spacing: 2px;">Все завершено!</h2>
+            <p style="color: #e0e0e0; margin-bottom: 25px;">Вы решили все доступные на данный момент задачи. Ожидайте новых обновлений системы.</p>
+            
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <button id="btnRepeatLast" class="btn-action" style="border-color: #ffaa00; color: #ffaa00;">[ Повторить последнюю задачу ]</button>
+                <button id="btnGoToTasks" class="btn-action">[ Выбрать задачу ]</button>
+                <button id="btnCloseModal" class="btn-action logout">[ Отмена ]</button>
+            </div>
+        </div>
     </div>
 
     <script type="module" src="./src/scripts/menu.js"></script>
