@@ -60,6 +60,21 @@ async def handle_submit(
         code=data.code
     )
 
+
+
+    if is_correct and submission.room_id:
+        # Оповещаем всю комнату о прогрессе!
+        await manager.broadcast(
+            message={
+                "event": "progress_update",
+                "user_id": current_user.id,
+                "username": current_user.username,
+                "completed_tasks": participant.completed_tasks_count + 1
+            },
+            room_id=submission.room_id
+        )
+
+
     # 4. Возвращаем ПОЛНЫЙ ответ + флаг already_solved для фронтенда
     return {
         "status": is_correct,

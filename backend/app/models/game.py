@@ -17,6 +17,10 @@ class Task(Base):
 
     submissions = relationship("Submission", back_populates="task")
 
+    # === НОВЫЕ СВЯЗИ ===
+    room_tasks = relationship("RoomTask", back_populates="task", cascade="all, delete-orphan")
+    room_submissions = relationship("RoomSubmission", back_populates="task", cascade="all, delete-orphan")
+
 
 class Team(Base):
     __tablename__ = "teams"

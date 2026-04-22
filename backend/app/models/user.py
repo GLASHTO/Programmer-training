@@ -27,3 +27,9 @@ class User(Base):
     submissions = relationship("Submission", back_populates="user", cascade="all, delete-orphan")
 
     is_admin = Column(Boolean, default=False)
+
+
+    # === НОВЫЕ СВЯЗИ ===
+    created_rooms = relationship("Room", back_populates="creator", cascade="all, delete-orphan")
+    room_participations = relationship("RoomParticipant", back_populates="user", cascade="all, delete-orphan")
+    room_submissions = relationship("RoomSubmission", back_populates="user", cascade="all, delete-orphan")
