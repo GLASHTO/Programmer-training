@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Соревнования</title>
+    <link rel="stylesheet" href="./src/css/menu.css">
+</head>
+<body>
+    <div class="menu-container">
+        <header class="menu-header">
+            <h1 class="sys-title">СОРЕВНОВАНИЯ</h1>
+        </header>
+
+        <div class="stats-panel" style="text-align: center;">
+            <p>Создай свою комнату и пригласи друзей, либо введи код существующей комнаты.</p>
+        </div>
+
+        <nav class="main-nav" style="margin-top: 20px;">
+            <button class="nav-btn" id="btnCreateRoom">[ СОЗДАТЬ КОМНАТУ ]</button>
+            
+            <div style="margin: 20px 0; display: flex; gap: 10px; justify-content: center;">
+                <input type="text" id="roomCodeInput" placeholder="Код комнаты" style="padding: 10px; background: #111; color: #00f3ff; border: 1px solid #333; outline: none; text-transform: uppercase;">
+                <button class="nav-btn" id="btnJoinRoom" style="margin: 0; width: auto;">[ ВОЙТИ ]</button>
+            </div>
+
+            <button class="nav-btn logout" onclick="window.location.href='/menu.html'">[ НАЗАД В МЕНЮ ]</button>
+        </nav>
+    </div>
+
+    <script type="module" src="./src/scripts/rooms.js"></script>
+</body>
+</html>

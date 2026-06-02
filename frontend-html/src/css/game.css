@@ -194,3 +194,5 @@
   50% { opacity: 0.5; }
   100% { opacity: 1; }
 }
+
+@keyframes spin { 100% { transform: rotate(360deg); } }

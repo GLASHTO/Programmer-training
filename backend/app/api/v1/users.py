@@ -2,13 +2,15 @@ from app.api.v1.auth import get_current_user
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import func
+from passlib.exc import UnknownHashError  # <-- ДОБАВЛЕН ИМПОРТ ДЛЯ ПЕРЕХВАТА ОШИБКИ ХЭША
 
 from app.models import User, Team
 from app.models.submission import UserScore
 from app.core.database import get_db
-from app.core.security import hash_password,  verify_password
+from app.core.security import hash_password, verify_password
 from app.schemas.user import UserCreate, UserPasswChange, UserToTeam, OneUserOut, UserProfileOut
 from app.models.submission import Submission
+
 router = APIRouter(prefix="/users", tags=["Users"])
 
 
@@ -19,6 +21,7 @@ def create_user(data: UserCreate, db: Session = Depends(get_db)):
     existing_user = db.query(User).filter(User.username == data.username).first()
     if existing_user:
         raise HTTPException(status_code=409, detail="User already exists")
+    
     # Хешируем пароль
     hashed_password = hash_password(data.password)
 
@@ -46,17 +49,6 @@ def get_user(user_id: int, db: Session = Depends(get_db)):
 
 
 ### Добавить пользователя в команду и проверить
-# @router.put("/to_team")
-# def set_team(data: UserToTeam, db: Session = Depends(get_db)):
-#     user = db.query(User).filter(User.id == data.user_id).first()
-#     team = db.query(Team).filter(Team.id == data.team_id).first()
-    
-#     if not user or not team:
-#         raise HTTPException(404, "User or Team not found")
-
-#     user.team_id = data.team_id
-#     db.commit()
-#     return {"status": "ok", "user": user.username, "team": team.team_name}
 @router.put("/to_team")
 def set_team(
     data: UserToTeam, 
@@ -68,7 +60,6 @@ def set_team(
     user = db.query(User).filter(User.id == data.user_id).first()
     
     # Если делает сам пользователь, то user = current_user
-    
     team = db.query(Team).filter(Team.id == data.team_id).first()
     
     if not user or not team:
@@ -88,7 +79,7 @@ def set_team(
 
 
 
-### Смена пароля
+### Смена пароля (ИСПРАВЛЕНО)
 @router.put("/new_password")
 def set_password(data: UserPasswChange, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.id == data.id).first()
@@ -96,17 +87,20 @@ def set_password(data: UserPasswChange, db: Session = Depends(get_db)):
     if not user:
         raise HTTPException(404, "User not found")
     
-   
-    # Хешируем пароль
+    # Проверка, что новый пароль не совпадает со старым (с защитой от старых паролей без хэша)
+    try:
+        if verify_password(data.password, user.password):
+            raise HTTPException(status_code=400, detail="New password cannot be the same as the old password")
+    except UnknownHashError:
+        # Если в базе лежал старый пароль без хэширования
+        if data.password == user.password:
+             raise HTTPException(status_code=400, detail="New password cannot be the same as the old password")
+    
+    # Хешируем новый пароль ПОСЛЕ успешного прохождения всех проверок
     hashed_password = hash_password(data.password)
-    
-    # Проверка, что новый пароль не совпадает со старым
-    if verify_password(data.password, user.password):
-        raise HTTPException(status_code=400, detail="New password cannot be the same as the old password")
-    
 
     # смена пароля пользователя
-    user.password= hashed_password
+    user.password = hashed_password
     db.commit()
     return {"status": "ok", "user": user.username, "new_password": user.password}
 
@@ -125,6 +119,7 @@ def delete_user(user_id: int, db: Session = Depends(get_db)):
     db.commit()
     
     return {"status": "ok", "message": f"User {user.username} deleted"}
+
 
 ### Получить полные данные профиля пользователя с командой и очками
 @router.get("/{user_id}/profile", response_model=UserProfileOut)

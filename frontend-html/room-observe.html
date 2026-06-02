@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Наблюдение за соревнованием</title>
+    <link rel="stylesheet" href="./src/css/game.css">
+    <style>
+        /* Специфичные стили для админ-панели */
+        .observe-container { display: flex; flex-direction: column; height: 100vh; padding: 20px; }
+        .stats-grid { display: grid; grid-template-columns: 1fr 300px; gap: 20px; flex-grow: 1; }
+        .log-panel { background: #111; border: 1px solid #333; padding: 15px; overflow-y: auto; font-family: monospace; }
+        .log-entry { margin-bottom: 5px; font-size: 0.9rem; border-left: 2px solid #00f3ff; padding-left: 10px; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="module" src="./src/react/RoomObserveApp.jsx"></script>
+</body>
+</html>

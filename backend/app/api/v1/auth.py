@@ -1,4 +1,3 @@
-
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from jose import jwt
@@ -6,6 +5,7 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.models.user import User
 from app.core.security import verify_password, create_access_token
+from passlib.exc import UnknownHashError  # <-- ДОБАВЛЕН ИМПОРТ
 
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError
@@ -24,8 +24,16 @@ def login(data: UserLogin, db: Session = Depends(get_db)):
     # 1. Ищем пользователя
     user = db.query(User).filter(User.username == data.username).first()
     
-    # 2. Проверяем существование и пароль
-    if not user or not verify_password(data.password, user.password):
+    # 2. Проверяем существование и пароль с защитой от старых хэшей
+    is_password_correct = False
+    if user:
+        try:
+            is_password_correct = verify_password(data.password, user.password)
+        except UnknownHashError:
+            # Если в базе лежит старый пароль обычным текстом
+            is_password_correct = (data.password == user.password)
+
+    if not user or not is_password_correct:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Неверное имя пользователя или пароль",
