@@ -1,51 +1,22 @@
-import axios from 'axios';
+import axios from 'axios'
 
 const apiClient = axios.create({
-    baseURL: 'http://10.25.2.4:8000',
-    headers: {
-        'Content-Type': 'application/json',
-    },
-});
+  baseURL: import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000/api/v1',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+})
 
-// Request Interceptor для добавления токена только в нужные запросы
-apiClient.interceptors.request.use(
-    (config) => {
-        // Убедись, что ключ в localStorage совпадает с тем, как ты его сохраняешь при логине
-        // (обычно это 'token' или 'access_token')
-        const token = localStorage.getItem('token'); 
-        
-        if (!token) {
-            return config;
-        }
+apiClient.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token')
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`
+  }
 
-        const method = config.method.toLowerCase();
-        const url = config.url;
+  return config
+})
 
-        const isSubmit = url.includes('/submit');
-        const isToTeam = url.includes('/to_team');
-        const isLeave = url.includes('/leave');
-        
-        // --- НОВОЕ: Проверка для роутов соревнований ---
-        const isRooms = url.includes('/rooms'); 
-        
-        // Проверка для /teams (POST создание или DELETE удаление)
-        const isTeamsRoute = url.includes('/teams/teams');
-        const isPostTeam = method === 'post' && isTeamsRoute;
-        const isDeleteTeam = method === 'delete' && isTeamsRoute;
-
-        // Добавили isRooms в главное условие
-        if (isSubmit || isToTeam || isLeave || isPostTeam || isDeleteTeam || isRooms) {
-            config.headers.Authorization = `Bearer ${token}`;
-        }
-
-        return config;
-    },
-    (error) => {
-        return Promise.reject(error);
-    }
-);
-
-export default apiClient;
+export default apiClient
 
 
 // import axios from 'axios';
